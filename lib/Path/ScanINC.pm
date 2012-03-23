@@ -3,7 +3,7 @@ use warnings;
 
 package Path::ScanINC;
 
-# ABSTRACT: Emulate Perls internal handling of @INC the way perl does it.
+# ABSTRACT: Emulate Perls internal handling of @INC.
 
 =head1 SYNOPSIS
 
