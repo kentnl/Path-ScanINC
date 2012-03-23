@@ -147,6 +147,15 @@ sub __check_object_method {
 	return 1;
 }
 
+=method new
+
+	my $object = $class->new(
+		 inc => [ 'x', 'y', 'z' , ],
+		 immutable => 1 | undef
+	);
+
+=cut
+
 sub new {
 	my ( $class, @args ) = @_;
 	__check_package_method( $class, 'new' );
@@ -186,6 +195,14 @@ sub _new {
 	return $obj;
 }
 
+=method immutable
+
+	if( $inc->immutable ) {
+		print "We're working with a snapshotted version of @INC";
+	}
+
+=cut
+
 sub immutable {
 	my ( $obj, @args ) = @_;
 	__check_object_method( $obj, 'immutable' );
@@ -216,6 +233,32 @@ sub _init_immutable {
 	}
 	return $obj;
 }
+
+=method inc
+
+	for my $i ( $inc->inc ) {
+		say "Plain: $incer" if not ref $incer;
+		say "Callback: $incer" if ref $incer;
+	}
+
+Returns a copy of the internal version of C<@INC> it will be using.
+
+If the object is C<immutable>, then this method will continue to report the same value as c<@INC>, or will be updated
+every time the orignal array reference passed during construction gets updated:
+
+	my $ref = [];
+	my $a = Path::ScanINC->new( inc => $inc );
+	my $b = Path::ScanINC->new( inc => $inc, immutable => 1 );
+
+	push @{$ref} , 'a';
+
+	is( [ $a->inc ]->[0] , 'a' , "non-immutable references keep tracking their original" );
+	isnt( [ $a->inc ]->[0] , 'a' , "immutable references are shallow-copied at construction" );
+
+Do note of course that is a B<SHALLOW> copy, so if you have multiple C<@INC> copies sharing the same C<array>/C<bless>
+references, changes to those references will be shared amongst all C<@INC>'s .
+
+=cut
 
 sub inc {
 	my ( $obj, @args ) = @_;
@@ -285,6 +328,22 @@ sub _ref_expand {
 	return [ undef, ];
 }
 
+=method first_file
+
+	if( defined ( my $file = $inc->first_file('Moose.pm') ) {
+		print "Yep, Moose seems to be available in \@INC , its at $file, but its not loaded (yet)\n";
+	}
+
+This proves to be a handy little gem that replaces the oft used
+
+	if( try { require Moose ; 1 } ){
+		Yadayadayada
+	}
+
+And adds the benefit of not needing to actually source the file to see if it exists or not.
+
+=cut
+
 sub first_file {
 	my ( $self, @args ) = @_;
 	__check_object_method( $self, 'first_file' );
@@ -308,6 +367,39 @@ sub first_file {
 	}
 	return;
 }
+
+=method all_files
+
+Returns all matches in all C<@INC> paths.
+
+	my $inc = Path::ScanINC->new();
+	push @INC, 'lib';
+	my ( @files ) = $inc->all_files('Something','Im','Working','On.pm');
+	pp(\@files );
+
+	# [
+	#    '/something/........./lib/Something/Im/Working/On.pm',
+	#    '/something/....../share/per5/lib/site_perl/5.15.9/Something/Im/Working/On.pm',
+	# ]
+
+Chances are if you understand how this can be useful, you'll do so immediately.
+
+Useful for debugging what module is being loaded, and possibly introspecting information about
+multiple parallel installs of modules in C<%ENV>, such as frequently the case with 'dual-life' modules.
+
+	perl -MPath::ScanINC -E 'my $scanner = Path::ScanINC->new(); say for $scanner->all_files(qw( Scalar Util.pm ))'
+	/usr/lib64/perl5/vendor_perl/5.12.4/x86_64-linux/Scalar/Util.pm
+	/usr/lib64/perl5/5.12.4/x86_64-linux/Scalar/Util.pm
+
+Sort-of like ye' olde' C<perldoc -l>, but more like C<man -a>
+
+I might even be tempted to make a sub-module to make one-liners easier like
+
+	perl -MPath::ScanINC::All=Scalar/Util.pm
+
+B<REMINDER>: If there are C<REFS> in C<@INC> that match, they'll return C<array-ref>'s, not strings.
+
+=cut
 
 sub all_files {
 	my ( $self, @args ) = @_;
@@ -333,6 +425,12 @@ sub all_files {
 	return @out;
 }
 
+=method first_dir
+
+Just like C<first_file> except for locating directories.
+
+=cut
+
 sub first_dir {
 	my ( $self, @args ) = @_;
 	__check_object_method( $self, 'first_dir' );
@@ -354,6 +452,12 @@ sub first_dir {
 	}
 	return;
 }
+
+=method all_dirs
+
+Just like C<all_dirs> except for locating directories.
+
+=cut
 
 sub all_dirs {
 	my ( $self, @args ) = @_;
