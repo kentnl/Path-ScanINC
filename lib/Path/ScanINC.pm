@@ -79,6 +79,7 @@ For more details, see L<< C<perldoc perlfunc> or C<perldoc -f require> |perlfunc
 
 # Sub Lazy-Aliases
 
+## no critic (ProhibitSubroutinePrototypes)
 sub __try(&;@) {
 	require Try::Tiny;
 	goto \&Try::Tiny::try;
@@ -98,6 +99,7 @@ sub __reftype($) {
 	require Scalar::Util;
 	goto \&Scalar::Util::reftype;
 }
+## use critic
 
 sub __pp {
 	require Data::Dump;
@@ -109,32 +111,40 @@ sub __croak {
 	goto \&Carp::croak;
 }
 
+## no critic (RequireArgUnpacking)
 sub __croakf {
 	require Carp;
 	my $str = sprintf @_;
 	@_ = ($str);
 	goto \&Carp::croak;
 }
+## use critic
 
 sub __check_package_method {
 	my ( $package, $method ) = @_;
 	if ( not defined $package ) {
+		## no critic (RequireInterpolationOfMetachars)
 		__croakf( '%s::%s should be called as %s->%s( @args )', __PACKAGE__, $method, __PACKAGE__, $method );
 	}
+	return 1;
 }
 
 sub __check_object_method {
 	my ( $object, $method ) = @_;
 	if ( not defined $object ) {
+		## no critic (RequireInterpolationOfMetachars)
 		__croakf( '%s::%s should be called as $object->%s( @args )', __PACKAGE__, $method, $method );
 	}
 	if ( not ref $object ) {
+		## no critic (RequireInterpolationOfMetachars)
 		__croakf( '%s::%s should be called as $object->%s( @args )', __PACKAGE__, $method, $method );
 	}
 	if ( not __blessed $object ) {
+		## no critic (RequireInterpolationOfMetachars)
 		__croakf( '%s::%s should be called as $object->%s( @args ) not %s::%s( $unblessed_ref, @args )',
 			__PACKAGE__, $method, $method, __PACKAGE__, $method );
 	}
+	return 1;
 }
 
 sub new {
@@ -151,6 +161,7 @@ sub _new {
 	my $config;
 	if ( @args == 1 ) {
 		if ( not ref $args[0] or not __try { my $i = $args[0]->{'key'}; 1 } __catch { undef } ) {
+			## no critic (RequireInterpolationOfMetachars)
 			__croakf(
 				'%s->new( @args ) expects either %s->new( x => y, x => y ) or %s->new({ x => y, x => y }). '
 					. '  You gave: %s->new( %s )',
@@ -161,6 +172,7 @@ sub _new {
 	}
 	else {
 		if ( @args % 2 != 0 ) {
+			## no critic (RequireInterpolationOfMetachars)
 			__croakf(
 				'%s->new( @args ) expects either %s->new( x => y, x => y ) or %s->new({ x => y, x => y }). '
 					. '  You gave: %s->new( %s )',
@@ -190,6 +202,8 @@ sub _init_immutable {
 			$obj->{immutable} = !!( $config->{immutable} );
 		}
 		else {
+			## no critic (RequireInterpolationOfMetachars)
+
 			__croakf(
 				'Initialization parameter \'%s\' to $object->new( ) ( %s->new() ) expects %s.'
 					. '   You gave $object->new( immutable => %s )',
@@ -200,6 +214,7 @@ sub _init_immutable {
 			);
 		}
 	}
+	return $obj;
 }
 
 sub inc {
@@ -214,6 +229,7 @@ sub _init_inc {
 	__check_object_method( $obj, '_init_inc' );
 	if ( exists $config->{inc} ) {
 		if ( not __try { my $i = $config->{inc}->[0]; 1 } __catch { undef } ) {
+			## no critic (RequireInterpolationOfMetachars)
 			__croakf(
 				'Initialization parameter \'%s\' to $object->new( ) ( %s->new() ) expects %s.'
 					. '   You gave $object->new( immutable => %s )',
@@ -233,7 +249,7 @@ sub _init_inc {
 			$obj->{inc} = [@INC];
 		}
 	}
-
+	return $obj;
 }
 
 sub _ref_expand {
@@ -263,6 +279,7 @@ sub _ref_expand {
 		}
 		return [ 1, @result ];
 	}
+	## no critic (RequireInterpolationOfMetachars)
 
 	__croakf( 'Unknown type of ref in @INC not supported: %s', __reftype($ref) );
 	return [ undef, ];
