@@ -356,7 +356,7 @@ sub first_file {
 	my ( $self, @args ) = @_;
 	__check_object_method( $self, 'first_file' );
 
-	my ( $suffix, $inc_suffix ) = $self->_path_normalize(@args);
+	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
 
 	for my $path ( $self->inc ) {
 		if ( ref $path ) {
@@ -412,7 +412,7 @@ sub all_files {
 	my ( $self, @args ) = @_;
 	__check_object_method( $self, 'all_files' );
 
-	my ( $suffix, $inc_suffix ) = $self->_path_normalize(@args);
+	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
 
 	my @out;
 	for my $path ( $self->inc ) {
@@ -442,7 +442,7 @@ Just like C<first_file> except for locating directories.
 sub first_dir {
 	my ( $self, @args ) = @_;
 	__check_object_method( $self, 'first_dir' );
-	my ( $suffix, $inc_suffix ) = $self->_path_normalize(@args);
+	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
 
 	for my $path ( $self->inc ) {
 		if ( ref $path ) {
@@ -470,7 +470,7 @@ Just like C<all_dirs> except for locating directories.
 sub all_dirs {
 	my ( $self, @args ) = @_;
 	__check_object_method( $self, 'all_dirs' );
-	my ( $suffix, $inc_suffix ) = $self->_path_normalize(@args);
+	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
 	my @out;
 	for my $path ( $self->inc ) {
 		if ( ref $path ) {
