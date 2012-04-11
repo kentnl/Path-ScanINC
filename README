@@ -2,7 +2,7 @@ NAME
     Path::ScanINC - Emulate Perls internal handling of @INC.
 
 VERSION
-    version 0.001
+    version 0.002
 
 SYNOPSIS
     The Aim of this module is to fully implement everything Perl does with
@@ -126,6 +126,41 @@ METHODS
 
     And adds the benefit of not needing to actually source the file to see
     if it exists or not.
+
+   IMPORTANT: PORTABILITIY
+    For best system portability, where possible, its suggested you specify
+    paths as arrays of strings, not slash-separatad strings.
+
+            $inc->first_file('MooseX' , 'Declare.pm')  # Good
+            $inc->first_file('MooseX/Declare.pm')      # Bad.
+
+    This is for several reasons, all of which can be summarised as
+    "Windows".
+
+    *   %INC keys all use Unix notation.
+
+    *   @INC callbacks expect Unix notataion.
+
+    *   "\" is a valid path part on Unix.
+
+    *   On Win32, we have to use "\" Separation, not "/" for resolving
+        physical files.
+
+    The sum of these means if you do this:
+
+            $inc->first_file('MooseX/Declare.pm')
+
+    On win32, it might just end up doing:
+
+            C:\some\path\here/MooseX/Declare.pm
+
+    Which may or may not work.
+
+    And additionally, if the above module is loaded, it will be loaded as
+
+            "MooseX/Declare.pm"
+
+    in %INC, not what you'd expect, "MooseX\Declare.pm"
 
   all_files
     Returns all matches in all @INC paths.

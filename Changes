@@ -1,5 +1,14 @@
 Release history for Path-ScanINC
 
+0.002 2012-04-11T05:44:56Z
+ [Documentation]
+ - Improved documentation on passing paths in a cross-system portable way.
+
+ [Internals]
+ - Seperate code logic for @INC callback lookup and physical path lookup,
+   as physical path lookup is always system dependent, while @INC callbacks
+   are always Unix style.
+
 0.001 2012-03-23T17:33:09Z
  - First version.
 

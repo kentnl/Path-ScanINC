@@ -6,7 +6,7 @@ BEGIN {
   $Path::ScanINC::AUTHORITY = 'cpan:KENTNL';
 }
 {
-  $Path::ScanINC::VERSION = '0.001';
+  $Path::ScanINC::VERSION = '0.002';
 }
 
 # ABSTRACT: Emulate Perls internal handling of @INC.
@@ -80,6 +80,14 @@ sub __check_object_method {
 			__PACKAGE__, $method, $method, __PACKAGE__, $method );
 	}
 	return 1;
+}
+
+sub _path_normalise {
+	my ( $object, @args ) = @_;
+	require File::Spec;
+	my $suffix = File::Spec->catdir(@args);
+	my $inc_suffix = join q{/}, @args;
+	return ( $suffix, $inc_suffix );
 }
 
 
@@ -228,12 +236,11 @@ sub first_file {
 	my ( $self, @args ) = @_;
 	__check_object_method( $self, 'first_file' );
 
-	require File::Spec;
-	my $suffix = File::Spec->catfile(@args);
+	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
 
 	for my $path ( $self->inc ) {
 		if ( ref $path ) {
-			my $result = $self->_ref_expand( $path, $suffix );
+			my $result = $self->_ref_expand( $path, $inc_suffix );
 			if ( $result->[0] ) {
 				shift @{$result};
 				return $result;
@@ -252,12 +259,13 @@ sub first_file {
 sub all_files {
 	my ( $self, @args ) = @_;
 	__check_object_method( $self, 'all_files' );
-	require File::Spec;
-	my $suffix = File::Spec->catfile(@args);
+
+	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
+
 	my @out;
 	for my $path ( $self->inc ) {
 		if ( ref $path ) {
-			my $result = $self->_ref_expand( $path, $suffix );
+			my $result = $self->_ref_expand( $path, $inc_suffix );
 			if ( $result->[0] ) {
 				shift @{$result};
 				push @out, $result;
@@ -277,11 +285,11 @@ sub all_files {
 sub first_dir {
 	my ( $self, @args ) = @_;
 	__check_object_method( $self, 'first_dir' );
-	require File::Spec;
-	my $suffix = File::Spec->catdir(@args);
+	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
+
 	for my $path ( $self->inc ) {
 		if ( ref $path ) {
-			my $result = $self->_ref_expand( $path, $suffix );
+			my $result = $self->_ref_expand( $path, $inc_suffix );
 			if ( $result->[0] ) {
 				shift @{$result};
 				return $result;
@@ -300,12 +308,11 @@ sub first_dir {
 sub all_dirs {
 	my ( $self, @args ) = @_;
 	__check_object_method( $self, 'all_dirs' );
-	require File::Spec;
-	my $suffix = File::Spec->catdir(@args);
+	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
 	my @out;
 	for my $path ( $self->inc ) {
 		if ( ref $path ) {
-			my $result = $self->_ref_expand( $path, $suffix );
+			my $result = $self->_ref_expand( $path, $inc_suffix );
 			if ( $result->[0] ) {
 				shift @{$result};
 				push @out, $result;
@@ -333,7 +340,7 @@ Path::ScanINC - Emulate Perls internal handling of @INC.
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -456,6 +463,44 @@ This proves to be a handy little gem that replaces the oft used
 	}
 
 And adds the benefit of not needing to actually source the file to see if it exists or not.
+
+=head4 B<IMPORTANT>: PORTABILITIY
+
+For best system portability, where possible, its suggested you specify paths as arrays
+of strings, not slash-separatad strings.
+
+	$inc->first_file('MooseX' , 'Declare.pm')  # Good
+	$inc->first_file('MooseX/Declare.pm')      # Bad.
+
+This is for several reasons, all of which can be summarised as "Windows".
+
+=over 4
+
+=item * C<%INC> keys all use Unix notation.
+
+=item * C<@INC> callbacks expect Unix notataion.
+
+=item * C<\> is a valid path part on Unix.
+
+=item * On Win32, we have to use C<\> Separation, not C</> for resolving physical files.
+
+=back
+
+The sum of these means if you do this:
+
+	$inc->first_file('MooseX/Declare.pm')
+
+On win32, it might just end up doing:
+
+	C:\some\path\here/MooseX/Declare.pm
+
+Which may or may not work.
+
+And additionally, if the above module is loaded, it will be loaded as
+
+	"MooseX/Declare.pm"
+
+in C<%INC>, not what you'd expect, C<MooseX\Declare.pm>
 
 =head2 all_files
 
