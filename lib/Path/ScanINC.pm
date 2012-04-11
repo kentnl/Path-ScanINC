@@ -147,6 +147,14 @@ sub __check_object_method {
 	return 1;
 }
 
+sub _path_normalise {
+	my ( $object, @args ) = @_;
+	require File::Spec;
+	my $suffix = File::Spec->catdir(@args);
+	my $inc_suffix = join q{/}, @args;
+	return ( $suffix, $inc_suffix );
+}
+
 =method new
 
 	my $object = $class->new(
@@ -348,12 +356,11 @@ sub first_file {
 	my ( $self, @args ) = @_;
 	__check_object_method( $self, 'first_file' );
 
-	require File::Spec;
-	my $suffix = File::Spec->catfile(@args);
+	my ( $suffix, $inc_suffix ) = $self->_path_normalize(@args);
 
 	for my $path ( $self->inc ) {
 		if ( ref $path ) {
-			my $result = $self->_ref_expand( $path, $suffix );
+			my $result = $self->_ref_expand( $path, $inc_suffix );
 			if ( $result->[0] ) {
 				shift @{$result};
 				return $result;
@@ -404,12 +411,13 @@ B<REMINDER>: If there are C<REFS> in C<@INC> that match, they'll return C<array-
 sub all_files {
 	my ( $self, @args ) = @_;
 	__check_object_method( $self, 'all_files' );
-	require File::Spec;
-	my $suffix = File::Spec->catfile(@args);
+
+	my ( $suffix, $inc_suffix ) = $self->_path_normalize(@args);
+
 	my @out;
 	for my $path ( $self->inc ) {
 		if ( ref $path ) {
-			my $result = $self->_ref_expand( $path, $suffix );
+			my $result = $self->_ref_expand( $path, $inc_suffix );
 			if ( $result->[0] ) {
 				shift @{$result};
 				push @out, $result;
@@ -434,11 +442,11 @@ Just like C<first_file> except for locating directories.
 sub first_dir {
 	my ( $self, @args ) = @_;
 	__check_object_method( $self, 'first_dir' );
-	require File::Spec;
-	my $suffix = File::Spec->catdir(@args);
+	my ( $suffix, $inc_suffix ) = $self->_path_normalize(@args);
+
 	for my $path ( $self->inc ) {
 		if ( ref $path ) {
-			my $result = $self->_ref_expand( $path, $suffix );
+			my $result = $self->_ref_expand( $path, $inc_suffix );
 			if ( $result->[0] ) {
 				shift @{$result};
 				return $result;
@@ -462,12 +470,11 @@ Just like C<all_dirs> except for locating directories.
 sub all_dirs {
 	my ( $self, @args ) = @_;
 	__check_object_method( $self, 'all_dirs' );
-	require File::Spec;
-	my $suffix = File::Spec->catdir(@args);
+	my ( $suffix, $inc_suffix ) = $self->_path_normalize(@args);
 	my @out;
 	for my $path ( $self->inc ) {
 		if ( ref $path ) {
-			my $result = $self->_ref_expand( $path, $suffix );
+			my $result = $self->_ref_expand( $path, $inc_suffix );
 			if ( $result->[0] ) {
 				shift @{$result};
 				push @out, $result;
