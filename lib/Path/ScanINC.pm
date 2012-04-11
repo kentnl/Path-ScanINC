@@ -350,6 +350,44 @@ This proves to be a handy little gem that replaces the oft used
 
 And adds the benefit of not needing to actually source the file to see if it exists or not.
 
+=head4 B<IMPORTANT>: PORTABILITIY
+
+For best system portability, where possible, its suggested you specify paths as arrays
+of strings, not slash-separatad strings.
+
+	$inc->first_file('MooseX' , 'Declare.pm')  # Good
+	$inc->first_file('MooseX/Declare.pm')      # Bad.
+
+This is for several reasons, all of which can be summarised as "Windows".
+
+=over 4
+
+=item * C<%INC> keys all use Unix notation.
+
+=item * C<@INC> callbacks expect Unix notataion.
+
+=item * C<\> is a valid path part on Unix.
+
+=item * On Win32, we have to use C<\> Separation, not C</> for resolving physical files.
+
+=back
+
+The sum of these means if you do this:
+
+	$inc->first_file('MooseX/Declare.pm')
+
+On win32, it might just end up doing:
+
+	C:\some\path\here/MooseX/Declare.pm
+
+Which may or may not work.
+
+And additionally, if the above module is loaded, it will be loaded as
+
+	"MooseX/Declare.pm"
+
+in C<%INC>, not what you'd expect, C<MooseX\Declare.pm>
+
 =cut
 
 sub first_file {
