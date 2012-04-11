@@ -1,6 +1,8 @@
 Release history for Path-ScanINC
 
 {{$NEXT}}
+
+0.002 2012-04-11T05:44:56Z
  [Documentation]
  - Improved documentation on passing paths in a cross-system portable way.
 
