@@ -15,7 +15,10 @@ sub will_win($)  { $will_reason = $_[0]; $expect_undef = 1 }
 sub will_fail($) { $will_reason = $_[0]; $expect_undef = undef }
 
 sub t(&) {
-	my ($result) = &exception( $_[0] );
+	my $result = &exception( $_[0] );
+	if ( $ENV{TRACE_EXCEPTIONS} ) {
+		note $result if defined $result;
+	}
 	if ($expect_undef) {
 		if ( not defined $result ) {
 			return pass "[no exception] $will_reason";
