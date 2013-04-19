@@ -153,32 +153,41 @@ sub new {
 	return $class->_new(@args);
 }
 
+sub _bad_new {
+	my ( $class, @args ) = @_;
+	my $format =
+		  qq[Bad arguments to %s->new().\n]
+		. qq[Expected either:\n]
+		. qq[\t%s->new(  x => y, x => y  )\n]
+		. qq[or\t%s->new({ x => y, x => y })\n]
+		. qq[You gave: %s->new( %s )];
+
+	return __croakf( $format, $class, $class, $class, $class, __pp(@args) );
+}
+
+sub _new_onearg_config {
+	my ( $class, $arg ) = @_;
+	return $arg if ref $arg and __try { my $i = $arg->{'key'}; 1 } __catch { undef };
+	return $class->_bad_new($arg);
+}
+
+sub _new_multiargs_config {
+	my ( $class, @args ) = @_;
+	return {@args} if @args % 2 == 0;
+	return $class->_bad_new(@args);
+}
+
 sub _new {
 	my ( $class, @args ) = @_;
 	my $ref = {};
 	my $obj = bless $ref, $class;
 	my $config;
+
 	if ( @args == 1 ) {
-		if ( not ref $args[0] or not __try { my $i = $args[0]->{'key'}; 1 } __catch { undef } ) {
-			## no critic (RequireInterpolationOfMetachars)
-			__croakf(
-				'%s->new( @args ) expects either %s->new( x => y, x => y ) or %s->new({ x => y, x => y }). '
-					. '  You gave: %s->new( %s )',
-				$class, $class, $class, $class, __pp(@args)
-			);
-		}
-		$config = $args[0];
+		$config = $class->_new_onearg_config(@args);
 	}
 	else {
-		if ( @args % 2 != 0 ) {
-			## no critic (RequireInterpolationOfMetachars)
-			__croakf(
-				'%s->new( @args ) expects either %s->new( x => y, x => y ) or %s->new({ x => y, x => y }). '
-					. '  You gave: %s->new( %s )',
-				$class, $class, $class, $class, __pp(@args)
-			);
-		}
-		$config = {@args};
+		$config = $class->_new_multiargs_config(@args);
 	}
 	$obj->_init_immutable($config);
 	$obj->_init_inc($config);
@@ -201,24 +210,18 @@ sub immutable {
 	return;
 }
 
+sub _bad_param {
+	my ( $obj, $name, $expected, $got ) = @_;
+	my $format =
+		qq[Initialization parameter '%s' to \$object->new( ) ( %s->new() ) expects %s.\n] . qq[\tYou gave \$object->new( %s => %s )];
+	return __croakf( $format, $name, __blessed($obj), $expected, $name, __pp($got) );
+}
+
 sub _init_immutable {
 	my ( $obj, $config ) = @_;
 	if ( exists $config->{immutable} ) {
-		if ( not ref $config->{immutable} ) {
-			$obj->{immutable} = !!( $config->{immutable} );
-		}
-		else {
-			## no critic (RequireInterpolationOfMetachars)
-
-			__croakf(
-				'Initialization parameter \'%s\' to $object->new( ) ( %s->new() ) expects %s.'
-					. '   You gave $object->new( immutable => %s )',
-				'immutable',
-				__blessed($obj),
-				'a truthy(boolean-like) scalar',
-				__pp( $config->{immutable} )
-			);
-		}
+		return $obj->_bad_param( 'immutable', 'undef/a true value', $config->{immutable} ) if ref $config->{immutable};
+		$obj->{immutable} = !!( $config->{immutable} );
 	}
 	return $obj;
 }
@@ -259,17 +262,8 @@ sub inc {
 sub _init_inc {
 	my ( $obj, $config ) = @_;
 	if ( exists $config->{inc} ) {
-		if ( not __try { my $i = $config->{inc}->[0]; 1 } __catch { undef } ) {
-			## no critic (RequireInterpolationOfMetachars)
-			__croakf(
-				'Initialization parameter \'%s\' to $object->new( ) ( %s->new() ) expects %s.'
-					. '   You gave $object->new( immutable => %s )',
-				'inc',
-				__blessed($obj),
-				'an array-reference',
-				__pp( $config->{immutable} )
-			);
-		}
+		return $obj->_bad_param( 'inc', 'an array-reference', $config->{immutable} )
+			if not __try { my $i = $config->{inc}->[0]; 1 } __catch { undef };
 		$obj->{inc} = $config->{inc};
 	}
 	if ( $obj->immutable ) {
