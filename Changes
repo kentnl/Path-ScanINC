@@ -1,6 +1,6 @@
 Release history for Path-ScanINC
 
-0.003 2013-04-19T19:55:30Z
+0.003 2013-04-19T19:58:58Z
  [Dependencies::Added / develop requires]
  - Pod::Coverage::TrustPod
  - Test::CPAN::Changes 0.19
@@ -29,7 +29,8 @@ Release history for Path-ScanINC
  [Internals]
  - Overhauled some codepaths so error handling logic was unified
  - Carp errors will now acutally give errors, not numbers.
- - Removed some internal checks on invocation style between private methods.
+ - Removed some internal checks on invocation style between private
+   methods.
  - Improved error messages / error message utils.
  - tests slightly refactored and expanded.
 
