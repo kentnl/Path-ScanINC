@@ -6,7 +6,8 @@ use FindBin;
 
 use lib "$FindBin::Bin/lib";
 
-use winfail;
+use # hide this
+    winfail;
 
 # FILENAME: 01_basic.t
 # CREATED: 23/03/12 23:54:55 by Kent Fredric (kentnl) <kentfredric@gmail.com>
