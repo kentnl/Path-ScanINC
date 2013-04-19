@@ -45,11 +45,11 @@ SYNOPSIS
 REF SUPPORT IN @INC
     This module has elemental support for discovery of results in @INC using
     "CODE"/"ARRAY"/"BLESSED" entries in @INC. However, due to a limitation
-    as to how perl itself implements this functionality, the best we can do
-    at present is simply return what the above are expected to return. This
-    means if you have any of the above ref-types in @INC, and one of those
-    returns "a true value", you'll get handed back an "ARRAY" reference
-    instead of the file you were expecting.
+    as to how "perl" itself implements this functionality, the best we can
+    do at present is simply return what the above are expected to return.
+    This means if you have any of the above ref-types in @INC, and one of
+    those returns "a true value", you'll get handed back an "ARRAY"
+    reference instead of the file you were expecting.
 
     Fortunately, @INC barely ever has refs in it. But in the event you
     *need* to work with refs in @INC and you expect that those refs will
@@ -57,21 +57,21 @@ REF SUPPORT IN @INC
 
     a. Write your code to work with the "array-ref" returned by the
     respective reference on a match
-    b. Use the "all_" family of methods and try pretendeding that there are
-    no "array-refs" in the list it returns.
+    b. Use the "all_" family of methods and try pretending that there are no
+    "array-refs" in the list it returns.
 
     Its possible in a future release we may have better choices how to
     handle this situation in future, but don't bet on it.
 
     Given that the API as defined by Perl mandates "code-ref"'s return lists
     containing "file-handles" or iterative "code-ref"'s , not actual files,
-    the best I can forsee at this time we'd be able to do to make life
+    the best I can foresee at this time we'd be able to do to make life
     easier for you is creating a fake library somewhere in a "tempdir" and
-    stuffing the result of the "code-ref"'s into files in that dir prior to
-    returning a path to the generated file.
+    stuffing the result of the "code-ref"'s into files in that directory
+    prior to returning a path to the generated file.
 
     ( And it also tells me that they have to be "Real" file handles, not
-    tied or blessed ones, so being able to ask a filehandle what file it
+    tied or blessed ones, so being able to ask a "filehandle" what file it
     represents is equally slim.... if that is of course what you require )
 
     For more details, see "perldoc perlfunc" or "perldoc -f require" .
@@ -97,7 +97,7 @@ METHODS
     Returns a copy of the internal version of @INC it will be using.
 
     If the object is "immutable", then this method will continue to report
-    the same value as c<@INC>, or will be updated every time the orignal
+    the same value as c<@INC>, or will be updated every time the original
     array reference passed during construction gets updated:
 
             my $ref = [];
@@ -129,7 +129,7 @@ METHODS
 
    IMPORTANT: PORTABILITIY
     For best system portability, where possible, its suggested you specify
-    paths as arrays of strings, not slash-separatad strings.
+    paths as arrays of strings, not slash-separated strings.
 
             $inc->first_file('MooseX' , 'Declare.pm')  # Good
             $inc->first_file('MooseX/Declare.pm')      # Bad.
@@ -139,7 +139,7 @@ METHODS
 
     *   %INC keys all use Unix notation.
 
-    *   @INC callbacks expect Unix notataion.
+    *   @INC callbacks expect Unix notation.
 
     *   "\" is a valid path part on Unix.
 
