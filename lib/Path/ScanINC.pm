@@ -47,7 +47,7 @@ the behaviour with regard to C<sub refs> in C<@INC>.
 =head1 REF SUPPORT IN @INC
 
 This module has elemental support for discovery of results in C<@INC> using C<CODE>/C<ARRAY>/C<BLESSED> entries in
-C<@INC>. However, due to a limitation as to how perl itself implements this functionality, the best we can do at present
+C<@INC>. However, due to a limitation as to how C<perl> itself implements this functionality, the best we can do at present
 is simply return what the above are expected to return. This means if you have any of the above ref-types in C<@INC>,
 and one of those returns C<a true value>, you'll get handed back an C<ARRAY> reference instead of the file you were
 expecting.
@@ -59,19 +59,19 @@ expect that those refs will return C<true>, you have to pick one of two options,
 
 =item a. Write your code to work with the C<array-ref> returned by the respective reference on a match
 
-=item b. Use the C<all_> family of methods and try pretendeding that there are no C<array-refs> in the list it returns.
+=item b. Use the C<all_> family of methods and try pretending that there are no C<array-refs> in the list it returns.
 
 =back
 
 Its possible in a future release we may have better choices how to handle this situation in future, but don't bet on it.
 
 Given that the API as defined by Perl mandates C<code-ref>'s return lists containing C<file-handles> or iterative
-C<code-ref>'s , not actual files, the best I can forsee at this time we'd be able to do to make life easier for you is
-creating a fake library somewhere in a C<tempdir> and stuffing the result of the C<code-ref>'s into files in that dir
+C<code-ref>'s , not actual files, the best I can foresee at this time we'd be able to do to make life easier for you is
+creating a fake library somewhere in a C<tempdir> and stuffing the result of the C<code-ref>'s into files in that directory
 prior to returning a path to the generated file.
 
 ( And it also tells me that they have to be "Real" file handles, not tied or blessed ones, so being able to ask a
-filehandle what file it represents is equally slim.... if that is of course what you require )
+C<filehandle> what file it represents is equally slim.... if that is of course what you require )
 
 For more details, see L<< C<perldoc perlfunc> or C<perldoc -f require> |perlfunc/require >>.
 
@@ -235,7 +235,7 @@ sub _init_immutable {
 Returns a copy of the internal version of C<@INC> it will be using.
 
 If the object is C<immutable>, then this method will continue to report the same value as c<@INC>, or will be updated
-every time the orignal array reference passed during construction gets updated:
+every time the original array reference passed during construction gets updated:
 
 	my $ref = [];
 	my $a = Path::ScanINC->new( inc => $ref );
@@ -336,7 +336,7 @@ And adds the benefit of not needing to actually source the file to see if it exi
 =head4 B<IMPORTANT>: PORTABILITIY
 
 For best system portability, where possible, its suggested you specify paths as arrays
-of strings, not slash-separatad strings.
+of strings, not slash-separated strings.
 
 	$inc->first_file('MooseX' , 'Declare.pm')  # Good
 	$inc->first_file('MooseX/Declare.pm')      # Bad.
@@ -347,7 +347,7 @@ This is for several reasons, all of which can be summarised as "Windows".
 
 =item * C<%INC> keys all use Unix notation.
 
-=item * C<@INC> callbacks expect Unix notataion.
+=item * C<@INC> callbacks expect Unix notation.
 
 =item * C<\> is a valid path part on Unix.
 
