@@ -1,7 +1,7 @@
 
 use strict;
 use warnings;
- 
+
 package winfail;
 
 use Test::More;
@@ -33,12 +33,11 @@ sub t(&) {
 }
 
 sub import {
-    my $caller = caller(0);
-    no strict 'refs';
-    *{"${caller}::will_win"} = \&will_win;
-    *{"${caller}::will_fail"} = \&will_fail;
-    *{"${caller}::t"} = \&t;
-
+	my $caller = caller(0);
+	no strict 'refs';
+	*{"${caller}::will_win"}  = \&will_win;
+	*{"${caller}::will_fail"} = \&will_fail;
+	*{"${caller}::t"}         = \&t;
 
 }
 

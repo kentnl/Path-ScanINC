@@ -6,8 +6,7 @@ use FindBin;
 
 use lib "$FindBin::Bin/lib";
 
-use # hide this
-    winfail;
+use winfail;
 
 # FILENAME: 01_basic.t
 # CREATED: 23/03/12 23:54:55 by Kent Fredric (kentnl) <kentfredric@gmail.com>
@@ -52,7 +51,7 @@ will_win "Set inc = [  ] during construction";
 t { my $x = Path::ScanINC->_new( inc => [ 'x', 'y', 'z' ] ) };
 
 will_fail "Set inc = 'x' during construction";
-t { my $x = Path::ScanINC->_new( inc => 'x' ); };
+t { my $x = Path::ScanINC->_new( inc => 'x' ) };
 
 done_testing;
 
