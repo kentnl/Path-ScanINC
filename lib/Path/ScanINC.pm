@@ -89,7 +89,7 @@ sub __pp    { require Data::Dump; goto \&Data::Dump::pp; }
 sub __croak { require Carp;       goto \&Carp::croak; }
 
 ## no critic (RequireArgUnpacking)
-sub __croakf { require Carp; my $str = sprintf @_; @_ = ($str); goto \&Carp::croak; }
+sub __croakf { require Carp; @_ = ( sprintf $_[0], splice @_, 1 ); goto \&Carp::croak; }
 ## use critic
 
 # Basically check $_[0] is a valid package
