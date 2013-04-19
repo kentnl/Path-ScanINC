@@ -1,6 +1,8 @@
 Release history for Path-ScanINC
 
 {{$NEXT}}
+
+0.003 2013-04-19T19:58:58Z
  [Dependencies::Added / develop requires]
  - Pod::Coverage::TrustPod
  - Test::CPAN::Changes 0.19
