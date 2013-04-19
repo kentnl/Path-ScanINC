@@ -160,7 +160,7 @@ sub _bad_new {
 		. qq[Expected either:\n]
 		. qq[\t%s->new(  x => y, x => y  )\n]
 		. qq[or\t%s->new({ x => y, x => y })\n]
-		. qq[You gave: %s->new( %s )];
+		. q[You gave: %s->new( %s )];
 
 	return __croakf( $format, $class, $class, $class, $class, __pp(@args) );
 }
