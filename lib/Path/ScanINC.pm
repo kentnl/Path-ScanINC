@@ -80,71 +80,54 @@ For more details, see L<< C<perldoc perlfunc> or C<perldoc -f require> |perlfunc
 # Sub Lazy-Aliases
 
 ## no critic (ProhibitSubroutinePrototypes)
-sub __try(&;@) {
-	require Try::Tiny;
-	goto \&Try::Tiny::try;
-}
-
-sub __catch(&;@) {
-	require Try::Tiny;
-	goto \&Try::Tiny::catch;
-}
-
-sub __blessed($) {
-	require Scalar::Util;
-	goto \&Scalar::Util::blessed;
-}
-
-sub __reftype($) {
-	require Scalar::Util;
-	goto \&Scalar::Util::reftype;
-}
+sub __try(&;@)   { require Try::Tiny;    goto \&Try::Tiny::try; }
+sub __catch(&;@) { require Try::Tiny;    goto \&Try::Tiny::catch; }
+sub __blessed($) { require Scalar::Util; goto \&Scalar::Util::blessed; }
+sub __reftype($) { require Scalar::Util; goto \&Scalar::Util::reftype; }
 ## use critic
-
-sub __pp {
-	require Data::Dump;
-	goto \&Data::Dump::pp;
-}
-
-sub __croak {
-	require Carp;
-	goto \&Carp::croak;
-}
+sub __pp    { require Data::Dump; goto \&Data::Dump::pp; }
+sub __croak { require Carp;       goto \&Carp::croak; }
 
 ## no critic (RequireArgUnpacking)
-sub __croakf {
-	require Carp;
-	my $str = sprintf @_;
-	@_ = ($str);
-	goto \&Carp::croak;
-}
+sub __croakf { require Carp; my $str = sprintf @_; @_ = ($str); goto \&Carp::croak; }
 ## use critic
 
+# Basically check $_[0] is a valid package
+#
+# sub foo {
+#   __check_package_method( $_[0], 'WantedPkg', 'foo' );
+# }
+#
 sub __check_package_method {
-	my ( $package, $method ) = @_;
-	if ( not defined $package ) {
-		## no critic (RequireInterpolationOfMetachars)
-		__croakf( '%s::%s should be called as %s->%s( @args )', __PACKAGE__, $method, __PACKAGE__, $method );
-	}
-	return 1;
+	my ( $package, $want_pkg, $method ) = @_;
+	return 1 if defined $package and $package->isa($want_pkg);
+
+	my $format = qq[%s\n%s::%s should be called as %s->%s( \@args )];
+
+	return __croakf( $format, q[Invocant is undefined], $want_pkg, $method, $want_pkg, $method ) if not defined $package;
+	return __croakf( $format, qq[Invocant is not isa $want_pkg], $want_pkg, $method, $want_pkg, $method )
+		if not $package->isa($want_pkg);
+	return __croakf( $format, q[unknown reason], $want_pkg, $method, $want_pkg, $method );
 }
 
+# Check $_[0] is an object.
+#
+# sub bar {
+#    __check_object_method( $_[0] , __PACKAGE__, 'bar' );
+# }
+#
 sub __check_object_method {
-	my ( $object, $method ) = @_;
-	if ( not defined $object ) {
-		## no critic (RequireInterpolationOfMetachars)
-		__croakf( '%s::%s should be called as $object->%s( @args )', __PACKAGE__, $method, $method );
-	}
-	if ( not ref $object ) {
-		## no critic (RequireInterpolationOfMetachars)
-		__croakf( '%s::%s should be called as $object->%s( @args )', __PACKAGE__, $method, $method );
-	}
-	if ( not __blessed $object ) {
-		## no critic (RequireInterpolationOfMetachars)
-		__croakf( '%s::%s should be called as $object->%s( @args ) not %s::%s( $unblessed_ref, @args )',
-			__PACKAGE__, $method, $method, __PACKAGE__, $method );
-	}
-	return 1;
+	my ( $object, $want_pkg, $method ) = @_;
+	return 1 if defined $object and ref $object and __blessed($object);
+
+	my $format = qq[%s\n%s::%s should be called as \$object->%s( \@args )];
+
+	return __croakf( $format, q[Invocant is undefined],       $want_pkg, $method, $method ) if not defined $object;
+	return __croakf( $format, q[Invocant is not a reference], $want_pkg, $method, $method ) if not ref $object;
+	return __croakf( $format, q[Invocant is not blessed],     $want_pkg, $method, $method ) if not __blessed($object);
+
+	return __croakf( $format, q[unknown reason], $want_pkg, $method, $method );
+
 }
 
 sub _path_normalise {
@@ -166,13 +149,13 @@ sub _path_normalise {
 
 sub new {
 	my ( $class, @args ) = @_;
-	__check_package_method( $class, 'new' );
+	__check_package_method( $class, __PACKAGE__, 'new' );
 	return $class->_new(@args);
 }
 
 sub _new {
 	my ( $class, @args ) = @_;
-	__check_package_method( $class, '_new' );
+	__check_package_method( $class, __PACKAGE__, '_new' );
 	my $ref = {};
 	my $obj = bless $ref, $class;
 	my $config;
@@ -213,7 +196,7 @@ sub _new {
 
 sub immutable {
 	my ( $obj, @args ) = @_;
-	__check_object_method( $obj, 'immutable' );
+	__check_object_method( $obj, __PACKAGE__, 'immutable' );
 	return   if ( not exists $obj->{immutable} );
 	return 1 if $obj->{immutable};
 	return;
@@ -221,7 +204,7 @@ sub immutable {
 
 sub _init_immutable {
 	my ( $obj, $config ) = @_;
-	__check_object_method( $obj, '_init_immutable' );
+	__check_object_method( $obj, __PACKAGE__, '_init_immutable' );
 	if ( exists $config->{immutable} ) {
 		if ( not ref $config->{immutable} ) {
 			$obj->{immutable} = !!( $config->{immutable} );
@@ -270,14 +253,14 @@ references, changes to those references will be shared amongst all C<@INC>'s .
 
 sub inc {
 	my ( $obj, @args ) = @_;
-	__check_object_method( $obj, 'inc' );
+	__check_object_method( $obj, __PACKAGE__, 'inc' );
 	return @INC if ( not exists $obj->{inc} );
 	return @{ $obj->{inc} };
 }
 
 sub _init_inc {
 	my ( $obj, $config ) = @_;
-	__check_object_method( $obj, '_init_inc' );
+	__check_object_method( $obj, __PACKAGE__, '_init_inc' );
 	if ( exists $config->{inc} ) {
 		if ( not __try { my $i = $config->{inc}->[0]; 1 } __catch { undef } ) {
 			## no critic (RequireInterpolationOfMetachars)
@@ -305,7 +288,7 @@ sub _init_inc {
 
 sub _ref_expand {
 	my ( $self, $ref, $query ) = @_;
-	__check_object_method( $self, '_ref_expand' );
+	__check_object_method( $self, __PACKAGE__, '_ref_expand' );
 
 	# See perldoc perlfunc / require
 	if ( __blessed($ref) ) {
@@ -392,7 +375,7 @@ in C<%INC>, not what you'd expect, C<MooseX\Declare.pm>
 
 sub first_file {
 	my ( $self, @args ) = @_;
-	__check_object_method( $self, 'first_file' );
+	__check_object_method( $self, __PACKAGE__, 'first_file' );
 
 	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
 
@@ -448,7 +431,7 @@ B<REMINDER>: If there are C<REFS> in C<@INC> that match, they'll return C<array-
 
 sub all_files {
 	my ( $self, @args ) = @_;
-	__check_object_method( $self, 'all_files' );
+	__check_object_method( $self, __PACKAGE__, 'all_files' );
 
 	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
 
@@ -479,7 +462,7 @@ Just like C<first_file> except for locating directories.
 
 sub first_dir {
 	my ( $self, @args ) = @_;
-	__check_object_method( $self, 'first_dir' );
+	__check_object_method( $self, __PACKAGE__, 'first_dir' );
 	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
 
 	for my $path ( $self->inc ) {
@@ -507,7 +490,7 @@ Just like C<all_dirs> except for locating directories.
 
 sub all_dirs {
 	my ( $self, @args ) = @_;
-	__check_object_method( $self, 'all_dirs' );
+	__check_object_method( $self, __PACKAGE__, 'all_dirs' );
 	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
 	my @out;
 	for my $path ( $self->inc ) {
