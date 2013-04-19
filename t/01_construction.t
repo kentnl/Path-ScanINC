@@ -1,8 +1,12 @@
 use strict;
 use warnings;
 
-use Test::More 0.96;
-use Test::Fatal;
+use Test::More 0.98;
+use FindBin;
+
+use lib "$FindBin::Bin/lib";
+
+use winfail;
 
 # FILENAME: 01_basic.t
 # CREATED: 23/03/12 23:54:55 by Kent Fredric (kentnl) <kentfredric@gmail.com>
@@ -10,109 +14,44 @@ use Test::Fatal;
 
 use_ok('Path::ScanINC');
 
-is(
-	exception {
-		my $x = Path::ScanINC->new();
-	},
-	undef,
-	"Basic Construction"
-);
+will_win 'Basic Construction';
+t { my $x = Path::ScanINC->new() };
 
-is(
-	exception {
-		my $x = Path::ScanINC->_new();
-	},
-	undef,
-	"Basic Construction via _new"
-);
+will_win 'Basic Construction via _new';
+t { my $x = Path::ScanINC->_new() };
 
-is(
-	exception {
-		my $x = Path::ScanINC->_new( {} );
-	},
-	undef,
-	"Basic Construction with empty hash"
-);
+will_win 'Basic Construction with empty hash';
+t { my $x = Path::ScanINC->_new( {} ) };
 
-is(
-	exception {
-		my $x = Path::ScanINC->_new( { x => 'y' } );
-	},
-	undef,
-	"Basic Construction 1 item hash"
-);
+will_win 'Basic Construction 1 item hash';
+t { my $x = Path::ScanINC->_new( { x => 'y' } ) };
 
-is(
-	exception {
-		my $x = Path::ScanINC->_new( x => 'y' );
-	},
-	undef,
-	"Basic Construction 1 item hash as an array"
-);
+will_win 'Basic Construction 1 item hash as an array';
+t { my $x = Path::ScanINC->_new( x => 'y' ) };
 
-isnt(
-	exception {
-		my $x = Path::ScanINC->_new('x');
-	},
-	undef,
-	"Basic Construction 1 item non-hash ( die! )"
-);
+will_fail 'Basic Construction 1 item non-hash';
+t { my $x = Path::ScanINC->_new('x') };
 
-isnt(
-	exception {
-		my $x = Path::ScanINC->_new( 'x', 'y', 'z' );
-	},
-	undef,
-	"Basic Construction 3 item non-hash ( die! )"
-);
+will_fail 'Basic Construction 3 item non-hash';
+t { my $x = Path::ScanINC->_new( 'x', 'y', 'z' ) };
 
-is(
-	exception {
-		my $x = Path::ScanINC->_new( immutable => 1 );
-	},
-	undef,
-	"Set immutable = 1 during construction"
-);
+will_win 'Set immutable = 1 during construction';
+t { my $x = Path::ScanINC->_new( immutable => 1 ) };
 
-is(
-	exception {
-		my $x = Path::ScanINC->_new( immutable => undef );
-	},
-	undef,
-	"Set immutable = undef during construction"
-);
+will_win 'Set immutable = undef during construction';
+t { my $x = Path::ScanINC->_new( immutable => undef ) };
 
-isnt(
-	exception {
-		my $x = Path::ScanINC->_new( immutable => [] );
-	},
-	undef,
-	"Set immutable = [] during construction ( die! )"
-);
+will_fail 'Set immutable = [] during construction';
+t { my $x = Path::ScanINC->_new( immutable => [] ) };
 
-is(
-	exception {
-		my $x = Path::ScanINC->_new( inc => \@INC );
-	},
-	undef,
-	"Set inc = \\\@INC during construction"
-);
+will_win "Set inc = \\\@INC during construction";
+t { my $x = Path::ScanINC->_new( inc => \@INC ) };
 
-is(
-	exception {
-		my $x = Path::ScanINC->_new( inc => [ 'x', 'y', 'z' ] );
-	},
-	undef,
-	"Set inc = [  ] during construction"
-);
+will_win "Set inc = [  ] during construction";
+t { my $x = Path::ScanINC->_new( inc => [ 'x', 'y', 'z' ] ) };
 
-isnt(
-	exception {
-		my $x = Path::ScanINC->_new( inc => 'x' );
-	},
-	undef,
-	"Set inc = 'x' during construction ( die! )"
-);
+will_fail "Set inc = 'x' during construction";
+t { my $x = Path::ScanINC->_new( inc => 'x' ) };
 
 done_testing;
 
