@@ -15,6 +15,7 @@ t/000-report-versions-tiny.t
 t/01_construction.t
 t/02_immutable.t
 t/03_basic_scanfile.t
+t/lib/winfail.pm
 t/mocksystem/liba/.keep
 t/mocksystem/liba/example1/.keep
 t/mocksystem/libb/.keep
