@@ -155,7 +155,6 @@ sub new {
 
 sub _new {
 	my ( $class, @args ) = @_;
-	__check_package_method( $class, __PACKAGE__, '_new' );
 	my $ref = {};
 	my $obj = bless $ref, $class;
 	my $config;
@@ -204,7 +203,6 @@ sub immutable {
 
 sub _init_immutable {
 	my ( $obj, $config ) = @_;
-	__check_object_method( $obj, __PACKAGE__, '_init_immutable' );
 	if ( exists $config->{immutable} ) {
 		if ( not ref $config->{immutable} ) {
 			$obj->{immutable} = !!( $config->{immutable} );
@@ -260,7 +258,6 @@ sub inc {
 
 sub _init_inc {
 	my ( $obj, $config ) = @_;
-	__check_object_method( $obj, __PACKAGE__, '_init_inc' );
 	if ( exists $config->{inc} ) {
 		if ( not __try { my $i = $config->{inc}->[0]; 1 } __catch { undef } ) {
 			## no critic (RequireInterpolationOfMetachars)
@@ -288,7 +285,6 @@ sub _init_inc {
 
 sub _ref_expand {
 	my ( $self, $ref, $query ) = @_;
-	__check_object_method( $self, __PACKAGE__, '_ref_expand' );
 
 	# See perldoc perlfunc / require
 	if ( __blessed($ref) ) {
