@@ -35,14 +35,14 @@ sub __croakf { require Carp; my $str = sprintf @_; @_ = ($str); goto \&Carp::cro
 #
 sub __check_package_method {
 	my ( $package, $want_pkg, $method ) = @_;
-	return 1 if defined $package and $package->ISA($want_pkg);
+	return 1 if defined $package and $package->isa($want_pkg);
 
 	## no critic (RequireInterpolationOfMetachars)
 	my $format = qq[%s\n%s::%s should be called as %s->%s( \@args )];
 
 	return __croakf( $format, q[Invocant is undefined], $want_pkg, $method, $want_pkg, $method ) if not defined $package;
-	return __croakf( $format, qq[Invocant is not ISA $want_pkg], $want_pkg, $method, $want_pkg, $method )
-		if not $package->ISA($want_pkg);
+	return __croakf( $format, qq[Invocant is not isa $want_pkg], $want_pkg, $method, $want_pkg, $method )
+		if not $package->isa($want_pkg);
 	return __croakf( $format, q[unknown reason], $want_pkg, $method, $want_pkg, $method );
 }
 
