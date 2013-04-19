@@ -255,13 +255,13 @@ If the object is C<immutable>, then this method will continue to report the same
 every time the orignal array reference passed during construction gets updated:
 
 	my $ref = [];
-	my $a = Path::ScanINC->new( inc => $inc );
-	my $b = Path::ScanINC->new( inc => $inc, immutable => 1 );
+	my $a = Path::ScanINC->new( inc => $ref );
+	my $b = Path::ScanINC->new( inc => $ref, immutable => 1 );
 
 	push @{$ref} , 'a';
 
 	is( [ $a->inc ]->[0] , 'a' , "non-immutable references keep tracking their original" );
-	isnt( [ $a->inc ]->[0] , 'a' , "immutable references are shallow-copied at construction" );
+	isnt( [ $b->inc ]->[0] , 'a' , "immutable references are shallow-copied at construction" );
 
 Do note of course that is a B<SHALLOW> copy, so if you have multiple C<@INC> copies sharing the same C<array>/C<bless>
 references, changes to those references will be shared amongst all C<@INC>'s .
