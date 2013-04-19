@@ -60,6 +60,7 @@ eval { $v .= pmver('List::Util','any version') };
 eval { $v .= pmver('Module::Build','0.4004') };
 eval { $v .= pmver('Pod::Coverage::TrustPod','any version') };
 eval { $v .= pmver('Scalar::Util','any version') };
+eval { $v .= pmver('Test::CPAN::Changes','0.19') };
 eval { $v .= pmver('Test::CPAN::Meta','any version') };
 eval { $v .= pmver('Test::Fatal','any version') };
 eval { $v .= pmver('Test::More','0.98') };
