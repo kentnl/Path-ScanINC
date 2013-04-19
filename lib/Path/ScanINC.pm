@@ -6,7 +6,7 @@ BEGIN {
   $Path::ScanINC::AUTHORITY = 'cpan:KENTNL';
 }
 {
-  $Path::ScanINC::VERSION = '0.002';
+  $Path::ScanINC::VERSION = '0.003';
 }
 
 # ABSTRACT: Emulate Perls internal handling of @INC.
@@ -15,71 +15,54 @@ BEGIN {
 # Sub Lazy-Aliases
 
 ## no critic (ProhibitSubroutinePrototypes)
-sub __try(&;@) {
-	require Try::Tiny;
-	goto \&Try::Tiny::try;
-}
-
-sub __catch(&;@) {
-	require Try::Tiny;
-	goto \&Try::Tiny::catch;
-}
-
-sub __blessed($) {
-	require Scalar::Util;
-	goto \&Scalar::Util::blessed;
-}
-
-sub __reftype($) {
-	require Scalar::Util;
-	goto \&Scalar::Util::reftype;
-}
+sub __try(&;@)   { require Try::Tiny;    goto \&Try::Tiny::try; }
+sub __catch(&;@) { require Try::Tiny;    goto \&Try::Tiny::catch; }
+sub __blessed($) { require Scalar::Util; goto \&Scalar::Util::blessed; }
+sub __reftype($) { require Scalar::Util; goto \&Scalar::Util::reftype; }
 ## use critic
-
-sub __pp {
-	require Data::Dump;
-	goto \&Data::Dump::pp;
-}
-
-sub __croak {
-	require Carp;
-	goto \&Carp::croak;
-}
+sub __pp    { require Data::Dump; goto \&Data::Dump::pp; }
+sub __croak { require Carp;       goto \&Carp::croak; }
 
 ## no critic (RequireArgUnpacking)
-sub __croakf {
-	require Carp;
-	my $str = sprintf @_;
-	@_ = ($str);
-	goto \&Carp::croak;
-}
+sub __croakf { require Carp; @_ = ( sprintf $_[0], splice @_, 1 ); goto \&Carp::croak; }
 ## use critic
 
+# Basically check $_[0] is a valid package
+#
+# sub foo {
+#   __check_package_method( $_[0], 'WantedPkg', 'foo' );
+# }
+#
 sub __check_package_method {
-	my ( $package, $method ) = @_;
-	if ( not defined $package ) {
-		## no critic (RequireInterpolationOfMetachars)
-		__croakf( '%s::%s should be called as %s->%s( @args )', __PACKAGE__, $method, __PACKAGE__, $method );
-	}
-	return 1;
+	my ( $package, $want_pkg, $method ) = @_;
+	return 1 if defined $package and $package->isa($want_pkg);
+
+	my $format = qq[%s\n%s::%s should be called as %s->%s( \@args )];
+
+	return __croakf( $format, q[Invocant is undefined], $want_pkg, $method, $want_pkg, $method ) if not defined $package;
+	return __croakf( $format, qq[Invocant is not isa $want_pkg], $want_pkg, $method, $want_pkg, $method )
+		if not $package->isa($want_pkg);
+	return __croakf( $format, q[unknown reason], $want_pkg, $method, $want_pkg, $method );
 }
 
+# Check $_[0] is an object.
+#
+# sub bar {
+#    __check_object_method( $_[0] , __PACKAGE__, 'bar' );
+# }
+#
 sub __check_object_method {
-	my ( $object, $method ) = @_;
-	if ( not defined $object ) {
-		## no critic (RequireInterpolationOfMetachars)
-		__croakf( '%s::%s should be called as $object->%s( @args )', __PACKAGE__, $method, $method );
-	}
-	if ( not ref $object ) {
-		## no critic (RequireInterpolationOfMetachars)
-		__croakf( '%s::%s should be called as $object->%s( @args )', __PACKAGE__, $method, $method );
-	}
-	if ( not __blessed $object ) {
-		## no critic (RequireInterpolationOfMetachars)
-		__croakf( '%s::%s should be called as $object->%s( @args ) not %s::%s( $unblessed_ref, @args )',
-			__PACKAGE__, $method, $method, __PACKAGE__, $method );
-	}
-	return 1;
+	my ( $object, $want_pkg, $method ) = @_;
+	return 1 if defined $object and ref $object and __blessed($object);
+
+	my $format = qq[%s\n%s::%s should be called as \$object->%s( \@args )];
+
+	return __croakf( $format, q[Invocant is undefined],       $want_pkg, $method, $method ) if not defined $object;
+	return __croakf( $format, q[Invocant is not a reference], $want_pkg, $method, $method ) if not ref $object;
+	return __croakf( $format, q[Invocant is not blessed],     $want_pkg, $method, $method ) if not __blessed($object);
+
+	return __croakf( $format, q[unknown reason], $want_pkg, $method, $method );
+
 }
 
 sub _path_normalise {
@@ -93,37 +76,45 @@ sub _path_normalise {
 
 sub new {
 	my ( $class, @args ) = @_;
-	__check_package_method( $class, 'new' );
+	__check_package_method( $class, __PACKAGE__, 'new' );
 	return $class->_new(@args);
+}
+
+sub _bad_new {
+	my ( $class, @args ) = @_;
+	my $format =
+		  qq[Bad arguments to %s->new().\n]
+		. qq[Expected either:\n]
+		. qq[\t%s->new(  x => y, x => y  )\n]
+		. qq[or\t%s->new({ x => y, x => y })\n]
+		. q[You gave: %s->new( %s )];
+
+	return __croakf( $format, $class, $class, $class, $class, __pp(@args) );
+}
+
+sub _new_onearg_config {
+	my ( $class, $arg ) = @_;
+	return $arg if ref $arg and __try { my $i = $arg->{'key'}; 1 } __catch { undef };
+	return $class->_bad_new($arg);
+}
+
+sub _new_multiargs_config {
+	my ( $class, @args ) = @_;
+	return {@args} if @args % 2 == 0;
+	return $class->_bad_new(@args);
 }
 
 sub _new {
 	my ( $class, @args ) = @_;
-	__check_package_method( $class, '_new' );
 	my $ref = {};
 	my $obj = bless $ref, $class;
 	my $config;
+
 	if ( @args == 1 ) {
-		if ( not ref $args[0] or not __try { my $i = $args[0]->{'key'}; 1 } __catch { undef } ) {
-			## no critic (RequireInterpolationOfMetachars)
-			__croakf(
-				'%s->new( @args ) expects either %s->new( x => y, x => y ) or %s->new({ x => y, x => y }). '
-					. '  You gave: %s->new( %s )',
-				$class, $class, $class, $class, __pp(@args)
-			);
-		}
-		$config = $args[0];
+		$config = $class->_new_onearg_config(@args);
 	}
 	else {
-		if ( @args % 2 != 0 ) {
-			## no critic (RequireInterpolationOfMetachars)
-			__croakf(
-				'%s->new( @args ) expects either %s->new( x => y, x => y ) or %s->new({ x => y, x => y }). '
-					. '  You gave: %s->new( %s )',
-				$class, $class, $class, $class, __pp(@args)
-			);
-		}
-		$config = {@args};
+		$config = $class->_new_multiargs_config(@args);
 	}
 	$obj->_init_immutable($config);
 	$obj->_init_inc($config);
@@ -133,31 +124,24 @@ sub _new {
 
 sub immutable {
 	my ( $obj, @args ) = @_;
-	__check_object_method( $obj, 'immutable' );
+	__check_object_method( $obj, __PACKAGE__, 'immutable' );
 	return   if ( not exists $obj->{immutable} );
 	return 1 if $obj->{immutable};
 	return;
 }
 
+sub _bad_param {
+	my ( $obj, $name, $expected, $got ) = @_;
+	my $format =
+		qq[Initialization parameter '%s' to \$object->new( ) ( %s->new() ) expects %s.\n] . qq[\tYou gave \$object->new( %s => %s )];
+	return __croakf( $format, $name, __blessed($obj), $expected, $name, __pp($got) );
+}
+
 sub _init_immutable {
 	my ( $obj, $config ) = @_;
-	__check_object_method( $obj, '_init_immutable' );
 	if ( exists $config->{immutable} ) {
-		if ( not ref $config->{immutable} ) {
-			$obj->{immutable} = !!( $config->{immutable} );
-		}
-		else {
-			## no critic (RequireInterpolationOfMetachars)
-
-			__croakf(
-				'Initialization parameter \'%s\' to $object->new( ) ( %s->new() ) expects %s.'
-					. '   You gave $object->new( immutable => %s )',
-				'immutable',
-				__blessed($obj),
-				'a truthy(boolean-like) scalar',
-				__pp( $config->{immutable} )
-			);
-		}
+		return $obj->_bad_param( 'immutable', 'undef/a true value', $config->{immutable} ) if ref $config->{immutable};
+		$obj->{immutable} = !!( $config->{immutable} );
 	}
 	return $obj;
 }
@@ -165,26 +149,16 @@ sub _init_immutable {
 
 sub inc {
 	my ( $obj, @args ) = @_;
-	__check_object_method( $obj, 'inc' );
+	__check_object_method( $obj, __PACKAGE__, 'inc' );
 	return @INC if ( not exists $obj->{inc} );
 	return @{ $obj->{inc} };
 }
 
 sub _init_inc {
 	my ( $obj, $config ) = @_;
-	__check_object_method( $obj, '_init_inc' );
 	if ( exists $config->{inc} ) {
-		if ( not __try { my $i = $config->{inc}->[0]; 1 } __catch { undef } ) {
-			## no critic (RequireInterpolationOfMetachars)
-			__croakf(
-				'Initialization parameter \'%s\' to $object->new( ) ( %s->new() ) expects %s.'
-					. '   You gave $object->new( immutable => %s )',
-				'inc',
-				__blessed($obj),
-				'an array-reference',
-				__pp( $config->{immutable} )
-			);
-		}
+		return $obj->_bad_param( 'inc', 'an array-reference', $config->{immutable} )
+			if not __try { my $i = $config->{inc}->[0]; 1 } __catch { undef };
 		$obj->{inc} = $config->{inc};
 	}
 	if ( $obj->immutable ) {
@@ -200,7 +174,6 @@ sub _init_inc {
 
 sub _ref_expand {
 	my ( $self, $ref, $query ) = @_;
-	__check_object_method( $self, '_ref_expand' );
 
 	# See perldoc perlfunc / require
 	if ( __blessed($ref) ) {
@@ -234,7 +207,7 @@ sub _ref_expand {
 
 sub first_file {
 	my ( $self, @args ) = @_;
-	__check_object_method( $self, 'first_file' );
+	__check_object_method( $self, __PACKAGE__, 'first_file' );
 
 	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
 
@@ -258,7 +231,7 @@ sub first_file {
 
 sub all_files {
 	my ( $self, @args ) = @_;
-	__check_object_method( $self, 'all_files' );
+	__check_object_method( $self, __PACKAGE__, 'all_files' );
 
 	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
 
@@ -284,7 +257,7 @@ sub all_files {
 
 sub first_dir {
 	my ( $self, @args ) = @_;
-	__check_object_method( $self, 'first_dir' );
+	__check_object_method( $self, __PACKAGE__, 'first_dir' );
 	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
 
 	for my $path ( $self->inc ) {
@@ -307,7 +280,7 @@ sub first_dir {
 
 sub all_dirs {
 	my ( $self, @args ) = @_;
-	__check_object_method( $self, 'all_dirs' );
+	__check_object_method( $self, __PACKAGE__, 'all_dirs' );
 	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
 	my @out;
 	for my $path ( $self->inc ) {
@@ -330,6 +303,7 @@ sub all_dirs {
 1;
 
 __END__
+
 =pod
 
 =encoding utf-8
@@ -340,7 +314,7 @@ Path::ScanINC - Emulate Perls internal handling of @INC.
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -383,7 +357,7 @@ the behaviour with regard to C<sub refs> in C<@INC>.
 =head1 REF SUPPORT IN @INC
 
 This module has elemental support for discovery of results in C<@INC> using C<CODE>/C<ARRAY>/C<BLESSED> entries in
-C<@INC>. However, due to a limitation as to how perl itself implements this functionality, the best we can do at present
+C<@INC>. However, due to a limitation as to how C<perl> itself implements this functionality, the best we can do at present
 is simply return what the above are expected to return. This means if you have any of the above ref-types in C<@INC>,
 and one of those returns C<a true value>, you'll get handed back an C<ARRAY> reference instead of the file you were
 expecting.
@@ -395,19 +369,19 @@ expect that those refs will return C<true>, you have to pick one of two options,
 
 =item a. Write your code to work with the C<array-ref> returned by the respective reference on a match
 
-=item b. Use the C<all_> family of methods and try pretendeding that there are no C<array-refs> in the list it returns.
+=item b. Use the C<all_> family of methods and try pretending that there are no C<array-refs> in the list it returns.
 
 =back
 
 Its possible in a future release we may have better choices how to handle this situation in future, but don't bet on it.
 
 Given that the API as defined by Perl mandates C<code-ref>'s return lists containing C<file-handles> or iterative
-C<code-ref>'s , not actual files, the best I can forsee at this time we'd be able to do to make life easier for you is
-creating a fake library somewhere in a C<tempdir> and stuffing the result of the C<code-ref>'s into files in that dir
+C<code-ref>'s , not actual files, the best I can foresee at this time we'd be able to do to make life easier for you is
+creating a fake library somewhere in a C<tempdir> and stuffing the result of the C<code-ref>'s into files in that directory
 prior to returning a path to the generated file.
 
 ( And it also tells me that they have to be "Real" file handles, not tied or blessed ones, so being able to ask a
-filehandle what file it represents is equally slim.... if that is of course what you require )
+C<filehandle> what file it represents is equally slim.... if that is of course what you require )
 
 For more details, see L<< C<perldoc perlfunc> or C<perldoc -f require> |perlfunc/require >>.
 
@@ -436,16 +410,16 @@ For more details, see L<< C<perldoc perlfunc> or C<perldoc -f require> |perlfunc
 Returns a copy of the internal version of C<@INC> it will be using.
 
 If the object is C<immutable>, then this method will continue to report the same value as c<@INC>, or will be updated
-every time the orignal array reference passed during construction gets updated:
+every time the original array reference passed during construction gets updated:
 
 	my $ref = [];
-	my $a = Path::ScanINC->new( inc => $inc );
-	my $b = Path::ScanINC->new( inc => $inc, immutable => 1 );
+	my $a = Path::ScanINC->new( inc => $ref );
+	my $b = Path::ScanINC->new( inc => $ref, immutable => 1 );
 
 	push @{$ref} , 'a';
 
 	is( [ $a->inc ]->[0] , 'a' , "non-immutable references keep tracking their original" );
-	isnt( [ $a->inc ]->[0] , 'a' , "immutable references are shallow-copied at construction" );
+	isnt( [ $b->inc ]->[0] , 'a' , "immutable references are shallow-copied at construction" );
 
 Do note of course that is a B<SHALLOW> copy, so if you have multiple C<@INC> copies sharing the same C<array>/C<bless>
 references, changes to those references will be shared amongst all C<@INC>'s .
@@ -467,7 +441,7 @@ And adds the benefit of not needing to actually source the file to see if it exi
 =head4 B<IMPORTANT>: PORTABILITIY
 
 For best system portability, where possible, its suggested you specify paths as arrays
-of strings, not slash-separatad strings.
+of strings, not slash-separated strings.
 
 	$inc->first_file('MooseX' , 'Declare.pm')  # Good
 	$inc->first_file('MooseX/Declare.pm')      # Bad.
@@ -478,7 +452,7 @@ This is for several reasons, all of which can be summarised as "Windows".
 
 =item * C<%INC> keys all use Unix notation.
 
-=item * C<@INC> callbacks expect Unix notataion.
+=item * C<@INC> callbacks expect Unix notation.
 
 =item * C<\> is a valid path part on Unix.
 
@@ -547,10 +521,9 @@ Kent Fredric <kentnl@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Kent Fredric <kentnl@cpan.org>.
+This software is copyright (c) 2013 by Kent Fredric <kentnl@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
