@@ -24,6 +24,15 @@ Release history for Path-ScanINC
  [Documentation]
  - Fix some logic errors in code samples
  - Update Copyright year
+ - Add README.mkdn
+
+ [Internals]
+ - Overhauled some codepaths so error handling logic was unified
+ - Carp errors will now acutally give errors, not numbers.
+ - Removed some internal checks on invocation style between private
+   methods.
+ - Improved error messages / error message utils.
+ - tests slightly refactored and expanded.
 
  [Meta]
  - Bug tracker to github issues
