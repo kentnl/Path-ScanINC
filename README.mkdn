@@ -4,7 +4,7 @@ Path::ScanINC - Emulate Perls internal handling of @INC.
 
 # VERSION
 
-version 0.003
+version 0.004
 
 # SYNOPSIS
 
@@ -69,7 +69,7 @@ prior to returning a path to the generated file.
 ( And it also tells me that they have to be "Real" file handles, not tied or blessed ones, so being able to ask a
 `filehandle` what file it represents is equally slim.... if that is of course what you require )
 
-For more details, see [`perldoc perlfunc` or `perldoc -f require` ](http://search.cpan.org/perldoc?perlfunc#require).
+For more details, see [`perldoc perlfunc` or `perldoc -f require` ](https://metacpan.org/pod/perlfunc#require).
 
 # METHODS
 
