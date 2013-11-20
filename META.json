@@ -97,7 +97,6 @@
       },
       "test" : {
          "requires" : {
-            "File::Spec" : "0",
             "FindBin" : "0",
             "List::Util" : "0",
             "Test::Fatal" : "0",
@@ -109,7 +108,7 @@
    "provides" : {
       "Path::ScanINC" : {
          "file" : "lib/Path/ScanINC.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       }
    },
    "release_status" : "stable",
@@ -124,7 +123,7 @@
          "web" : "https://github.com/kentfredric/Path-ScanINC"
       }
    },
-   "version" : "0.010",
+   "version" : "0.011",
    "x_BuiltWith" : {
       "modules" : {
          "Carp" : "1.32",
@@ -174,7 +173,6 @@
          "Dist::Zilla::Plugin::UploadToCPAN" : "5.006",
          "Dist::Zilla::PluginBundle::Author::KENTNL" : "2.002001",
          "Dist::Zilla::PluginBundle::Author::KENTNL::Lite" : "1.7.2",
-         "File::Spec" : "3.45",
          "FindBin" : "1.51",
          "List::Util" : "1.35",
          "Module::Build" : "0.4202",
@@ -394,9 +392,9 @@
                         "version" : "4.004"
                      },
                      {
-                        "class" : "Pod::Weaver::Plugin::Encoding",
-                        "name" : "-Encoding",
-                        "version" : "0.02"
+                        "class" : "Pod::Weaver::Plugin::SingleEncoding",
+                        "name" : "-SingleEncoding",
+                        "version" : "4.004"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Name",

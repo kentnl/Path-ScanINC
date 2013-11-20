@@ -51,7 +51,6 @@ sub pmver {
 eval { $v .= pmver('Carp','any version') };
 eval { $v .= pmver('Class::Tiny','any version') };
 eval { $v .= pmver('Data::Dump','any version') };
-eval { $v .= pmver('File::Spec','any version') };
 eval { $v .= pmver('FindBin','any version') };
 eval { $v .= pmver('List::Util','any version') };
 eval { $v .= pmver('Module::Build','0.4202') };
