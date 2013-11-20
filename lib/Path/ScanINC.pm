@@ -144,10 +144,19 @@ sub _fix_inc {
 	return;
 }
 
+=begin Pod::Coverage
+
+BUILD
+
+=end Pod::Coverage
+
+=cut
+
 sub BUILD {
 	my ( $self, $args ) = @_;
 	$self->_fix_immutable;
 	$self->_fix_inc;
+    return;
 }
 
 =method inc
@@ -184,7 +193,7 @@ sub inc {
 
 sub _pm_inc_path {
 	my ( $self, @path_parts ) = @_;
-	return join '/', @path_parts;
+	return join q[/], @path_parts;
 }
 
 # This method deals with the fact there are refs in @INC, and they have special magic behaviour.
