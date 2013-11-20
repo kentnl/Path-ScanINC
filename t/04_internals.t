@@ -70,35 +70,6 @@ subtest __croakf => sub {
 	t { Path::ScanINC::__croakf('test') };
 };
 
-subtest __check_package_method => sub {
-	will_win 'Valid Parameters';
-	t { Path::ScanINC::__check_package_method( 'Path::ScanINC', 'Path::ScanINC', 'test' ) };
-
-	will_fail 'undef invocant';
-	t { Path::ScanINC::__check_package_method( undef, 'Path::ScanINC', 'test' ) };
-
-	will_fail 'non-isa package invocant';
-	t { Path::ScanINC::__check_package_method( 'notapackage', 'Path::ScanINC', 'test' ) };
-};
-
-subtest __check_object_method => sub {
-
-	my $object = Path::ScanINC->new();
-
-	will_win 'Valid Parameters';
-	t { Path::ScanINC::__check_object_method( $object, 'Path::ScanINC', 'test' ) };
-
-	will_fail 'undef invocant';
-	t { Path::ScanINC::__check_object_method( undef, 'Path::ScanINC', 'test' ) };
-
-	will_fail 'scalar invocant';
-	t { Path::ScanINC::__check_object_method( 'notapackage', 'Path::ScanINC', 'test' ) };
-
-	will_fail 'ref but not blessed invocant';
-	t { Path::ScanINC::__check_object_method( \1, 'Path::ScanINC', 'test' ) };
-
-};
-
 subtest _path_normalise => sub {
 
 	will_win 'can call _path_normalise';

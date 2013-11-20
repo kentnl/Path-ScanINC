@@ -94,44 +94,6 @@ sub __croak { require Carp;       goto \&Carp::croak; }
 sub __croakf { require Carp; @_ = ( sprintf $_[0], splice @_, 1 ); goto \&Carp::croak; }
 ## use critic
 
-# Basically check $_[0] is a valid package
-#
-# sub foo {
-#   __check_package_method( $_[0], 'WantedPkg', 'foo' );
-# }
-#
-sub __check_package_method {
-	my ( $package, $want_pkg, $method ) = @_;
-	return 1 if defined $package and $package->isa($want_pkg);
-
-	my $format = qq[%s\n%s::%s should be called as %s->%s( \@args )];
-
-	return __croakf( $format, q[Invocant is undefined], $want_pkg, $method, $want_pkg, $method ) if not defined $package;
-	return __croakf( $format, qq[Invocant is not isa $want_pkg], $want_pkg, $method, $want_pkg, $method )
-		if not $package->isa($want_pkg);
-	return __croakf( $format, q[unknown reason], $want_pkg, $method, $want_pkg, $method );
-}
-
-# Check $_[0] is an object.
-#
-# sub bar {
-#    __check_object_method( $_[0] , __PACKAGE__, 'bar' );
-# }
-#
-sub __check_object_method {
-	my ( $object, $want_pkg, $method ) = @_;
-	return 1 if defined $object and ref $object and __blessed($object);
-
-	my $format = qq[%s\n%s::%s should be called as \$object->%s( \@args )];
-
-	return __croakf( $format, q[Invocant is undefined],       $want_pkg, $method, $method ) if not defined $object;
-	return __croakf( $format, q[Invocant is not a reference], $want_pkg, $method, $method ) if not ref $object;
-	return __croakf( $format, q[Invocant is not blessed],     $want_pkg, $method, $method ) if not __blessed($object);
-
-	return __croakf( $format, q[unknown reason], $want_pkg, $method, $method );
-
-}
-
 sub _path_normalise {
 	my ( $object, @args ) = @_;
 	require File::Spec;
@@ -224,7 +186,6 @@ references, changes to those references will be shared amongst all C<@INC>'s .
 
 sub inc {
 	my ( $obj, @args ) = @_;
-	__check_object_method( $obj, __PACKAGE__, 'inc' );
 	return @INC if ( not exists $obj->{inc} );
 	return @{ $obj->{inc} };
 }
@@ -317,7 +278,6 @@ in C<%INC>, not what you'd expect, C<MooseX\Declare.pm>
 
 sub first_file {
 	my ( $self, @args ) = @_;
-	__check_object_method( $self, __PACKAGE__, 'first_file' );
 
 	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
 
@@ -373,7 +333,6 @@ B<REMINDER>: If there are C<REFS> in C<@INC> that match, they'll return C<array-
 
 sub all_files {
 	my ( $self, @args ) = @_;
-	__check_object_method( $self, __PACKAGE__, 'all_files' );
 
 	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
 
@@ -403,8 +362,7 @@ Just like C<first_file> except for locating directories.
 =cut
 
 sub first_dir {
-	my ( $self, @args ) = @_;
-	__check_object_method( $self, __PACKAGE__, 'first_dir' );
+	my ( $self,   @args )       = @_;
 	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
 
 	for my $path ( $self->inc ) {
@@ -431,8 +389,7 @@ Just like C<all_dirs> except for locating directories.
 =cut
 
 sub all_dirs {
-	my ( $self, @args ) = @_;
-	__check_object_method( $self, __PACKAGE__, 'all_dirs' );
+	my ( $self,   @args )       = @_;
 	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
 	my @out;
 	for my $path ( $self->inc ) {
