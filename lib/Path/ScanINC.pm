@@ -78,6 +78,8 @@ For more details, see L<< C<perldoc perlfunc> or C<perldoc -f require> |perlfunc
 =cut
 
 # Sub Lazy-Aliases
+use subs 'inc';
+use Class::Tiny qw(inc immutable);
 
 ## no critic (ProhibitSubroutinePrototypes)
 sub __try(&;@)   { require Try::Tiny;    goto \&Try::Tiny::try; }
@@ -147,53 +149,6 @@ sub _path_normalise {
 
 =cut
 
-sub new {
-	my ( $class, @args ) = @_;
-	__check_package_method( $class, __PACKAGE__, 'new' );
-	return $class->_new(@args);
-}
-
-sub _bad_new {
-	my ( $class, @args ) = @_;
-	my $format =
-		  qq[Bad arguments to %s->new().\n]
-		. qq[Expected either:\n]
-		. qq[\t%s->new(  x => y, x => y  )\n]
-		. qq[or\t%s->new({ x => y, x => y })\n]
-		. q[You gave: %s->new( %s )];
-
-	return __croakf( $format, $class, $class, $class, $class, __pp(@args) );
-}
-
-sub _new_onearg_config {
-	my ( $class, $arg ) = @_;
-	return $arg if ref $arg and __try { my $i = $arg->{'key'}; 1 } __catch { undef };
-	return $class->_bad_new($arg);
-}
-
-sub _new_multiargs_config {
-	my ( $class, @args ) = @_;
-	return {@args} if @args % 2 == 0;
-	return $class->_bad_new(@args);
-}
-
-sub _new {
-	my ( $class, @args ) = @_;
-	my $ref = {};
-	my $obj = bless $ref, $class;
-	my $config;
-
-	if ( @args == 1 ) {
-		$config = $class->_new_onearg_config(@args);
-	}
-	else {
-		$config = $class->_new_multiargs_config(@args);
-	}
-	$obj->_init_immutable($config);
-	$obj->_init_inc($config);
-	return $obj;
-}
-
 =method immutable
 
 	if( $inc->immutable ) {
@@ -202,14 +157,6 @@ sub _new {
 
 =cut
 
-sub immutable {
-	my ( $obj, @args ) = @_;
-	__check_object_method( $obj, __PACKAGE__, 'immutable' );
-	return   if ( not exists $obj->{immutable} );
-	return 1 if $obj->{immutable};
-	return;
-}
-
 sub _bad_param {
 	my ( $obj, $name, $expected, $got ) = @_;
 	my $format =
@@ -217,13 +164,36 @@ sub _bad_param {
 	return __croakf( $format, $name, __blessed($obj), $expected, $name, __pp($got) );
 }
 
-sub _init_immutable {
-	my ( $obj, $config ) = @_;
-	if ( exists $config->{immutable} ) {
-		return $obj->_bad_param( 'immutable', 'undef/a true value', $config->{immutable} ) if ref $config->{immutable};
-		$obj->{immutable} = !!( $config->{immutable} );
+sub _fix_immutable {
+	my ($self) = @_;
+	if ( exists $self->{immutable} ) {
+		return $self->_bad_param( 'immutable', 'undef/a true value', $self->{immutable} ) if ref $self->{immutable};
+		$self->{immutable} = !!( $self->{immutable} );
 	}
-	return $obj;
+	return;
+}
+
+sub _fix_inc {
+	my ($self) = @_;
+	if ( exists $self->{inc} ) {
+		return $self->_bad_param( 'inc', 'an array-reference', $self->{inc} )
+			if not __try { my $i = $self->{inc}->[0]; 1 } __catch { undef };
+	}
+	if ( $self->immutable ) {
+		if ( exists $self->{inc} ) {
+			$self->{inc} = [ @{ $self->{inc} } ];
+		}
+		else {
+			$self->{inc} = [@INC];
+		}
+	}
+	return;
+}
+
+sub BUILD {
+	my ( $self, $args ) = @_;
+	$self->_fix_immutable;
+	$self->_fix_inc;
 }
 
 =method inc
@@ -257,24 +227,6 @@ sub inc {
 	__check_object_method( $obj, __PACKAGE__, 'inc' );
 	return @INC if ( not exists $obj->{inc} );
 	return @{ $obj->{inc} };
-}
-
-sub _init_inc {
-	my ( $obj, $config ) = @_;
-	if ( exists $config->{inc} ) {
-		return $obj->_bad_param( 'inc', 'an array-reference', $config->{immutable} )
-			if not __try { my $i = $config->{inc}->[0]; 1 } __catch { undef };
-		$obj->{inc} = $config->{inc};
-	}
-	if ( $obj->immutable ) {
-		if ( exists $obj->{inc} ) {
-			$obj->{inc} = [ @{ $obj->{inc} } ];
-		}
-		else {
-			$obj->{inc} = [@INC];
-		}
-	}
-	return $obj;
 }
 
 sub _ref_expand {
