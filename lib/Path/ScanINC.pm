@@ -427,7 +427,7 @@ Just like C<first_file> except for locating directories.
 
 Just like C<all_dirs> except for locating directories.
 
-=for POD::Coverage BUILD
+=for Pod::Coverage BUILD
 
 =head1 AUTHOR
 

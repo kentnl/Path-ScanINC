@@ -1,6 +1,6 @@
 Release history for Path-ScanINC
 
-0.004 2013-11-20T04:23:08Z
+0.004 2013-11-20T04:24:35Z
  [00 Major Changes]
  - Internals reimplemented in terms of Module::Build and Path::Tiny
  - Interface should however still be mostly the same.
