@@ -109,7 +109,7 @@
    "provides" : {
       "Path::ScanINC" : {
          "file" : "lib/Path/ScanINC.pm",
-         "version" : "0.004"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
@@ -124,7 +124,7 @@
          "web" : "https://github.com/kentfredric/Path-ScanINC"
       }
    },
-   "version" : "0.004",
+   "version" : "0.010",
    "x_BuiltWith" : {
       "modules" : {
          "Carp" : "1.32",

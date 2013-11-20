@@ -6,7 +6,7 @@ BEGIN {
   $Path::ScanINC::AUTHORITY = 'cpan:KENTNL';
 }
 {
-  $Path::ScanINC::VERSION = '0.004';
+  $Path::ScanINC::VERSION = '0.010';
 }
 
 # ABSTRACT: Emulate Perls internal handling of @INC.
@@ -226,7 +226,7 @@ Path::ScanINC - Emulate Perls internal handling of @INC.
 
 =head1 VERSION
 
-version 0.004
+version 0.010
 
 =head1 SYNOPSIS
 

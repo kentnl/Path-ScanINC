@@ -22,7 +22,7 @@ name: Path-ScanINC
 provides:
   Path::ScanINC:
     file: lib/Path/ScanINC.pm
-    version: 0.004
+    version: 0.010
 requires:
   Carp: 0
   Class::Tiny: 0
@@ -38,7 +38,7 @@ resources:
   bugtracker: https://github.com/kentfredric/Path-ScanINC/issues
   homepage: https://github.com/kentfredric/Path-ScanINC
   repository: https://github.com/kentfredric/Path-ScanINC.git
-version: 0.004
+version: 0.010
 x_BuiltWith:
   modules:
     Carp: 1.32

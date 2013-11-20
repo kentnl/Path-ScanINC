@@ -17,7 +17,7 @@ my %module_build_args = (
     "Kent Fredric <kentnl\@cpan.org>"
   ],
   "dist_name" => "Path-ScanINC",
-  "dist_version" => "0.004",
+  "dist_version" => "0.010",
   "license" => "perl",
   "module_name" => "Path::ScanINC",
   "recommends" => {},
