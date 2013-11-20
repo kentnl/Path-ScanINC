@@ -17,41 +17,38 @@ use_ok('Path::ScanINC');
 will_win 'Basic Construction';
 t { my $x = Path::ScanINC->new() };
 
-will_win 'Basic Construction via _new';
-t { my $x = Path::ScanINC->_new() };
-
 will_win 'Basic Construction with empty hash';
-t { my $x = Path::ScanINC->_new( {} ) };
+t { my $x = Path::ScanINC->new( {} ) };
 
 will_win 'Basic Construction 1 item hash';
-t { my $x = Path::ScanINC->_new( { x => 'y' } ) };
+t { my $x = Path::ScanINC->new( { inc => [] } ) };
 
 will_win 'Basic Construction 1 item hash as an array';
-t { my $x = Path::ScanINC->_new( x => 'y' ) };
+t { my $x = Path::ScanINC->new( inc => [] ) };
 
 will_fail 'Basic Construction 1 item non-hash';
-t { my $x = Path::ScanINC->_new('x') };
+t { my $x = Path::ScanINC->new('x') };
 
 will_fail 'Basic Construction 3 item non-hash';
-t { my $x = Path::ScanINC->_new( 'x', 'y', 'z' ) };
+t { my $x = Path::ScanINC->new( 'x', 'y', 'z' ) };
 
 will_win 'Set immutable = 1 during construction';
-t { my $x = Path::ScanINC->_new( immutable => 1 ) };
+t { my $x = Path::ScanINC->new( immutable => 1 ) };
 
 will_win 'Set immutable = undef during construction';
-t { my $x = Path::ScanINC->_new( immutable => undef ) };
+t { my $x = Path::ScanINC->new( immutable => undef ) };
 
 will_fail 'Set immutable = [] during construction';
-t { my $x = Path::ScanINC->_new( immutable => [] ) };
+t { my $x = Path::ScanINC->new( immutable => [] ) };
 
 will_win "Set inc = \\\@INC during construction";
-t { my $x = Path::ScanINC->_new( inc => \@INC ) };
+t { my $x = Path::ScanINC->new( inc => \@INC ) };
 
 will_win "Set inc = [  ] during construction";
-t { my $x = Path::ScanINC->_new( inc => [ 'x', 'y', 'z' ] ) };
+t { my $x = Path::ScanINC->new( inc => [ 'x', 'y', 'z' ] ) };
 
 will_fail "Set inc = 'x' during construction";
-t { my $x = Path::ScanINC->_new( inc => 'x' ) };
+t { my $x = Path::ScanINC->new( inc => 'x' ) };
 
 done_testing;
 

@@ -10,7 +10,7 @@ TODO
 dist.ini
 lib/Path/ScanINC.pm
 perlcritic.rc
-t/00-compile.t
+t/00-compile/lib_Path_ScanINC_pm.t
 t/000-report-versions-tiny.t
 t/01_construction.t
 t/02_immutable.t
