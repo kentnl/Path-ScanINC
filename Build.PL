@@ -17,7 +17,7 @@ my %module_build_args = (
     "Kent Fredric <kentnl\@cpan.org>"
   ],
   "dist_name" => "Path-ScanINC",
-  "dist_version" => "0.010",
+  "dist_version" => "0.011",
   "license" => "perl",
   "module_name" => "Path::ScanINC",
   "recommends" => {},
@@ -36,7 +36,6 @@ my %module_build_args = (
   },
   "script_files" => [],
   "test_requires" => {
-    "File::Spec" => 0,
     "FindBin" => 0,
     "List::Util" => 0,
     "Test::Fatal" => 0,
@@ -47,7 +46,6 @@ my %module_build_args = (
 
 
 my %fallback_build_requires = (
-  "File::Spec" => 0,
   "FindBin" => 0,
   "List::Util" => 0,
   "Module::Build" => "0.4202",

@@ -1,5 +1,12 @@
 Release history for Path-ScanINC
 
+0.011 2013-11-20T12:27:09Z
+ [00 Bugfix]
+ - Attempt to solve Win32 quirk by using more Path::Tiny
+
+ [Dependencies::Removed / test requires]
+ - File::Spec
+
 0.010 2013-11-20T04:28:29Z
  [00 Major Changes]
  - Internals reimplemented in terms of Module::Build and Path::Tiny
