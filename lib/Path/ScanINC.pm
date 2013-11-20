@@ -64,10 +64,12 @@ sub _fix_inc {
 	return;
 }
 
+
 sub BUILD {
 	my ( $self, $args ) = @_;
 	$self->_fix_immutable;
 	$self->_fix_inc;
+    return;
 }
 
 
@@ -79,7 +81,7 @@ sub inc {
 
 sub _pm_inc_path {
 	my ( $self, @path_parts ) = @_;
-	return join '/', @path_parts;
+	return join q[/], @path_parts;
 }
 
 # This method deals with the fact there are refs in @INC, and they have special magic behaviour.
@@ -424,6 +426,8 @@ Just like C<first_file> except for locating directories.
 =head2 all_dirs
 
 Just like C<all_dirs> except for locating directories.
+
+=for POD::Coverage BUILD
 
 =head1 AUTHOR
 
