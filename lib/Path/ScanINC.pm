@@ -6,13 +6,15 @@ BEGIN {
   $Path::ScanINC::AUTHORITY = 'cpan:KENTNL';
 }
 {
-  $Path::ScanINC::VERSION = '0.003';
+  $Path::ScanINC::VERSION = '0.010';
 }
 
 # ABSTRACT: Emulate Perls internal handling of @INC.
 
 
 # Sub Lazy-Aliases
+use subs 'inc';
+use Class::Tiny qw(inc immutable);
 
 ## no critic (ProhibitSubroutinePrototypes)
 sub __try(&;@)   { require Try::Tiny;    goto \&Try::Tiny::try; }
@@ -22,113 +24,12 @@ sub __reftype($) { require Scalar::Util; goto \&Scalar::Util::reftype; }
 ## use critic
 sub __pp    { require Data::Dump; goto \&Data::Dump::pp; }
 sub __croak { require Carp;       goto \&Carp::croak; }
-
+sub __path  { require Path::Tiny; goto \&Path::Tiny::path; }
 ## no critic (RequireArgUnpacking)
 sub __croakf { require Carp; @_ = ( sprintf $_[0], splice @_, 1 ); goto \&Carp::croak; }
 ## use critic
 
-# Basically check $_[0] is a valid package
-#
-# sub foo {
-#   __check_package_method( $_[0], 'WantedPkg', 'foo' );
-# }
-#
-sub __check_package_method {
-	my ( $package, $want_pkg, $method ) = @_;
-	return 1 if defined $package and $package->isa($want_pkg);
 
-	my $format = qq[%s\n%s::%s should be called as %s->%s( \@args )];
-
-	return __croakf( $format, q[Invocant is undefined], $want_pkg, $method, $want_pkg, $method ) if not defined $package;
-	return __croakf( $format, qq[Invocant is not isa $want_pkg], $want_pkg, $method, $want_pkg, $method )
-		if not $package->isa($want_pkg);
-	return __croakf( $format, q[unknown reason], $want_pkg, $method, $want_pkg, $method );
-}
-
-# Check $_[0] is an object.
-#
-# sub bar {
-#    __check_object_method( $_[0] , __PACKAGE__, 'bar' );
-# }
-#
-sub __check_object_method {
-	my ( $object, $want_pkg, $method ) = @_;
-	return 1 if defined $object and ref $object and __blessed($object);
-
-	my $format = qq[%s\n%s::%s should be called as \$object->%s( \@args )];
-
-	return __croakf( $format, q[Invocant is undefined],       $want_pkg, $method, $method ) if not defined $object;
-	return __croakf( $format, q[Invocant is not a reference], $want_pkg, $method, $method ) if not ref $object;
-	return __croakf( $format, q[Invocant is not blessed],     $want_pkg, $method, $method ) if not __blessed($object);
-
-	return __croakf( $format, q[unknown reason], $want_pkg, $method, $method );
-
-}
-
-sub _path_normalise {
-	my ( $object, @args ) = @_;
-	require File::Spec;
-	my $suffix = File::Spec->catdir(@args);
-	my $inc_suffix = join q{/}, @args;
-	return ( $suffix, $inc_suffix );
-}
-
-
-sub new {
-	my ( $class, @args ) = @_;
-	__check_package_method( $class, __PACKAGE__, 'new' );
-	return $class->_new(@args);
-}
-
-sub _bad_new {
-	my ( $class, @args ) = @_;
-	my $format =
-		  qq[Bad arguments to %s->new().\n]
-		. qq[Expected either:\n]
-		. qq[\t%s->new(  x => y, x => y  )\n]
-		. qq[or\t%s->new({ x => y, x => y })\n]
-		. q[You gave: %s->new( %s )];
-
-	return __croakf( $format, $class, $class, $class, $class, __pp(@args) );
-}
-
-sub _new_onearg_config {
-	my ( $class, $arg ) = @_;
-	return $arg if ref $arg and __try { my $i = $arg->{'key'}; 1 } __catch { undef };
-	return $class->_bad_new($arg);
-}
-
-sub _new_multiargs_config {
-	my ( $class, @args ) = @_;
-	return {@args} if @args % 2 == 0;
-	return $class->_bad_new(@args);
-}
-
-sub _new {
-	my ( $class, @args ) = @_;
-	my $ref = {};
-	my $obj = bless $ref, $class;
-	my $config;
-
-	if ( @args == 1 ) {
-		$config = $class->_new_onearg_config(@args);
-	}
-	else {
-		$config = $class->_new_multiargs_config(@args);
-	}
-	$obj->_init_immutable($config);
-	$obj->_init_inc($config);
-	return $obj;
-}
-
-
-sub immutable {
-	my ( $obj, @args ) = @_;
-	__check_object_method( $obj, __PACKAGE__, 'immutable' );
-	return   if ( not exists $obj->{immutable} );
-	return 1 if $obj->{immutable};
-	return;
-}
 
 sub _bad_param {
 	my ( $obj, $name, $expected, $got ) = @_;
@@ -137,54 +38,76 @@ sub _bad_param {
 	return __croakf( $format, $name, __blessed($obj), $expected, $name, __pp($got) );
 }
 
-sub _init_immutable {
-	my ( $obj, $config ) = @_;
-	if ( exists $config->{immutable} ) {
-		return $obj->_bad_param( 'immutable', 'undef/a true value', $config->{immutable} ) if ref $config->{immutable};
-		$obj->{immutable} = !!( $config->{immutable} );
+sub _fix_immutable {
+	my ($self) = @_;
+	if ( exists $self->{immutable} ) {
+		return $self->_bad_param( 'immutable', 'undef/a true value', $self->{immutable} ) if ref $self->{immutable};
+		$self->{immutable} = !!( $self->{immutable} );
 	}
-	return $obj;
+	return;
+}
+
+sub _fix_inc {
+	my ($self) = @_;
+	if ( exists $self->{inc} ) {
+		return $self->_bad_param( 'inc', 'an array-reference', $self->{inc} )
+			if not __try { my $i = $self->{inc}->[0]; 1 } __catch { undef };
+	}
+	if ( $self->immutable ) {
+		if ( exists $self->{inc} ) {
+			$self->{inc} = [ @{ $self->{inc} } ];
+		}
+		else {
+			$self->{inc} = [@INC];
+		}
+	}
+	return;
+}
+
+
+sub BUILD {
+	my ( $self, $args ) = @_;
+	$self->_fix_immutable;
+	$self->_fix_inc;
+    return;
 }
 
 
 sub inc {
 	my ( $obj, @args ) = @_;
-	__check_object_method( $obj, __PACKAGE__, 'inc' );
 	return @INC if ( not exists $obj->{inc} );
 	return @{ $obj->{inc} };
 }
 
-sub _init_inc {
-	my ( $obj, $config ) = @_;
-	if ( exists $config->{inc} ) {
-		return $obj->_bad_param( 'inc', 'an array-reference', $config->{immutable} )
-			if not __try { my $i = $config->{inc}->[0]; 1 } __catch { undef };
-		$obj->{inc} = $config->{inc};
-	}
-	if ( $obj->immutable ) {
-		if ( exists $obj->{inc} ) {
-			$obj->{inc} = [ @{ $obj->{inc} } ];
-		}
-		else {
-			$obj->{inc} = [@INC];
-		}
-	}
-	return $obj;
+sub _pm_inc_path {
+	my ( $self, @path_parts ) = @_;
+	return join q[/], @path_parts;
 }
 
+# This method deals with the fact there are refs in @INC, and they have special magic behaviour.
+#
+# Perl itself, simply invokes special behaviours on those refs, passing the path given in `require`
+#
+# So in comparison
+#
+# $self->_ref_expand( $ref, @query )
+#
+# Invokes those methods, after converting @query to notional format.
+#
+
 sub _ref_expand {
-	my ( $self, $ref, $query ) = @_;
+	my ( $self, $ref, @query ) = @_;
 
 	# See perldoc perlfunc / require
 	if ( __blessed($ref) ) {
-		my (@result) = $ref->INC($query);
+		my (@result) = $ref->INC( $self->_pm_inc_path(@query) );
 		if ( not @result ) {
 			return [ undef, ];
 		}
 		return [ 1, @result ];
 	}
 	if ( __reftype($ref) eq 'CODE' ) {
-		my (@result) = $ref->( $ref, $query );
+		my (@result) = $ref->( $ref, $self->_pm_inc_path(@query) );
 		if ( not @result ) {
 			return [ undef, ];
 		}
@@ -192,7 +115,7 @@ sub _ref_expand {
 	}
 	if ( __reftype($ref) eq 'ARRAY' ) {
 		my $code = $ref->[0];
-		my (@result) = $code->( $ref, $query );
+		my (@result) = $code->( $ref, $self->_pm_inc_path(@query) );
 		if ( not @result ) {
 			return [ undef, ];
 		}
@@ -207,20 +130,17 @@ sub _ref_expand {
 
 sub first_file {
 	my ( $self, @args ) = @_;
-	__check_object_method( $self, __PACKAGE__, 'first_file' );
-
-	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
 
 	for my $path ( $self->inc ) {
 		if ( ref $path ) {
-			my $result = $self->_ref_expand( $path, $inc_suffix );
+			my $result = $self->_ref_expand( $path, @args );
 			if ( $result->[0] ) {
 				shift @{$result};
 				return $result;
 			}
 			next;
 		}
-		my $fullpath = File::Spec->catfile( $path, $suffix );
+		my $fullpath = __path($path)->child(@args);
 		if ( -e $fullpath and -f $fullpath ) {
 			return $fullpath;
 		}
@@ -231,22 +151,18 @@ sub first_file {
 
 sub all_files {
 	my ( $self, @args ) = @_;
-	__check_object_method( $self, __PACKAGE__, 'all_files' );
-
-	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
 
 	my @out;
 	for my $path ( $self->inc ) {
 		if ( ref $path ) {
-			my $result = $self->_ref_expand( $path, $inc_suffix );
+			my $result = $self->_ref_expand( $path, @args );
 			if ( $result->[0] ) {
 				shift @{$result};
 				push @out, $result;
 			}
 			next;
 		}
-		require File::Spec;
-		my $fullpath = File::Spec->catfile( $path, $suffix );
+		my $fullpath = __path($path)->child(@args);
 		if ( -e $fullpath and -f $fullpath ) {
 			push @out, $fullpath;
 		}
@@ -257,19 +173,17 @@ sub all_files {
 
 sub first_dir {
 	my ( $self, @args ) = @_;
-	__check_object_method( $self, __PACKAGE__, 'first_dir' );
-	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
 
 	for my $path ( $self->inc ) {
 		if ( ref $path ) {
-			my $result = $self->_ref_expand( $path, $inc_suffix );
+			my $result = $self->_ref_expand( $path, @args );
 			if ( $result->[0] ) {
 				shift @{$result};
 				return $result;
 			}
 			next;
 		}
-		my $fullpath = File::Spec->catdir( $path, $suffix );
+		my $fullpath = __path($path)->child(@args);
 		if ( -e $fullpath and -d $fullpath ) {
 			return $fullpath;
 		}
@@ -280,19 +194,17 @@ sub first_dir {
 
 sub all_dirs {
 	my ( $self, @args ) = @_;
-	__check_object_method( $self, __PACKAGE__, 'all_dirs' );
-	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
 	my @out;
 	for my $path ( $self->inc ) {
 		if ( ref $path ) {
-			my $result = $self->_ref_expand( $path, $inc_suffix );
+			my $result = $self->_ref_expand( $path, @args );
 			if ( $result->[0] ) {
 				shift @{$result};
 				push @out, $result;
 			}
 			next;
 		}
-		my $fullpath = File::Spec->catdir( $path, $suffix );
+		my $fullpath = __path($path)->child(@args);
 		if ( -e $fullpath and -d $fullpath ) {
 			push @out, $fullpath;
 		}
@@ -306,7 +218,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -314,7 +226,7 @@ Path::ScanINC - Emulate Perls internal handling of @INC.
 
 =head1 VERSION
 
-version 0.003
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -514,6 +426,8 @@ Just like C<first_file> except for locating directories.
 =head2 all_dirs
 
 Just like C<all_dirs> except for locating directories.
+
+=for Pod::Coverage BUILD
 
 =head1 AUTHOR
 
