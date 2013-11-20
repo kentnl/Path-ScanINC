@@ -70,16 +70,5 @@ subtest __croakf => sub {
 	t { Path::ScanINC::__croakf('test') };
 };
 
-subtest _path_normalise => sub {
-
-	will_win 'can call _path_normalise';
-
-	my ( $suffix, $inc_suffix );
-
-	t { ( $suffix, $inc_suffix ) = Path::ScanINC->_path_normalise( 'a', 'b', 'c' ) };
-
-	is( $inc_suffix, 'a/b/c', 'inc_suffix computation works' );
-};
-
 done_testing;
 

@@ -55,6 +55,7 @@ eval { $v .= pmver('File::Spec','any version') };
 eval { $v .= pmver('FindBin','any version') };
 eval { $v .= pmver('List::Util','any version') };
 eval { $v .= pmver('Module::Build','0.4202') };
+eval { $v .= pmver('Path::Tiny','any version') };
 eval { $v .= pmver('Scalar::Util','any version') };
 eval { $v .= pmver('Test::Fatal','any version') };
 eval { $v .= pmver('Test::More','1.001002') };

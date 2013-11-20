@@ -24,18 +24,10 @@ sub __reftype($) { require Scalar::Util; goto \&Scalar::Util::reftype; }
 ## use critic
 sub __pp    { require Data::Dump; goto \&Data::Dump::pp; }
 sub __croak { require Carp;       goto \&Carp::croak; }
-
+sub __path  { require Path::Tiny; goto \&Path::Tiny::path; }
 ## no critic (RequireArgUnpacking)
 sub __croakf { require Carp; @_ = ( sprintf $_[0], splice @_, 1 ); goto \&Carp::croak; }
 ## use critic
-
-sub _path_normalise {
-	my ( $object, @args ) = @_;
-	require File::Spec;
-	my $suffix = File::Spec->catdir(@args);
-	my $inc_suffix = join q{/}, @args;
-	return ( $suffix, $inc_suffix );
-}
 
 
 
@@ -85,19 +77,35 @@ sub inc {
 	return @{ $obj->{inc} };
 }
 
+sub _pm_inc_path {
+	my ( $self, @path_parts ) = @_;
+	return join '/', @path_parts;
+}
+
+# This method deals with the fact there are refs in @INC, and they have special magic behaviour.
+#
+# Perl itself, simply invokes special behaviours on those refs, passing the path given in `require`
+#
+# So in comparison
+#
+# $self->_ref_expand( $ref, @query )
+#
+# Invokes those methods, after converting @query to notional format.
+#
+
 sub _ref_expand {
-	my ( $self, $ref, $query ) = @_;
+	my ( $self, $ref, @query ) = @_;
 
 	# See perldoc perlfunc / require
 	if ( __blessed($ref) ) {
-		my (@result) = $ref->INC($query);
+		my (@result) = $ref->INC( $self->_pm_inc_path(@query) );
 		if ( not @result ) {
 			return [ undef, ];
 		}
 		return [ 1, @result ];
 	}
 	if ( __reftype($ref) eq 'CODE' ) {
-		my (@result) = $ref->( $ref, $query );
+		my (@result) = $ref->( $ref, $self->_pm_inc_path(@query) );
 		if ( not @result ) {
 			return [ undef, ];
 		}
@@ -105,7 +113,7 @@ sub _ref_expand {
 	}
 	if ( __reftype($ref) eq 'ARRAY' ) {
 		my $code = $ref->[0];
-		my (@result) = $code->( $ref, $query );
+		my (@result) = $code->( $ref, $self->_pm_inc_path(@query) );
 		if ( not @result ) {
 			return [ undef, ];
 		}
@@ -121,18 +129,16 @@ sub _ref_expand {
 sub first_file {
 	my ( $self, @args ) = @_;
 
-	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
-
 	for my $path ( $self->inc ) {
 		if ( ref $path ) {
-			my $result = $self->_ref_expand( $path, $inc_suffix );
+			my $result = $self->_ref_expand( $path, @args );
 			if ( $result->[0] ) {
 				shift @{$result};
 				return $result;
 			}
 			next;
 		}
-		my $fullpath = File::Spec->catfile( $path, $suffix );
+		my $fullpath = __path($path)->child(@args);
 		if ( -e $fullpath and -f $fullpath ) {
 			return $fullpath;
 		}
@@ -144,20 +150,17 @@ sub first_file {
 sub all_files {
 	my ( $self, @args ) = @_;
 
-	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
-
 	my @out;
 	for my $path ( $self->inc ) {
 		if ( ref $path ) {
-			my $result = $self->_ref_expand( $path, $inc_suffix );
+			my $result = $self->_ref_expand( $path, @args );
 			if ( $result->[0] ) {
 				shift @{$result};
 				push @out, $result;
 			}
 			next;
 		}
-		require File::Spec;
-		my $fullpath = File::Spec->catfile( $path, $suffix );
+		my $fullpath = __path($path)->child(@args);
 		if ( -e $fullpath and -f $fullpath ) {
 			push @out, $fullpath;
 		}
@@ -167,19 +170,18 @@ sub all_files {
 
 
 sub first_dir {
-	my ( $self,   @args )       = @_;
-	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
+	my ( $self, @args ) = @_;
 
 	for my $path ( $self->inc ) {
 		if ( ref $path ) {
-			my $result = $self->_ref_expand( $path, $inc_suffix );
+			my $result = $self->_ref_expand( $path, @args );
 			if ( $result->[0] ) {
 				shift @{$result};
 				return $result;
 			}
 			next;
 		}
-		my $fullpath = File::Spec->catdir( $path, $suffix );
+		my $fullpath = __path($path)->child(@args);
 		if ( -e $fullpath and -d $fullpath ) {
 			return $fullpath;
 		}
@@ -189,19 +191,18 @@ sub first_dir {
 
 
 sub all_dirs {
-	my ( $self,   @args )       = @_;
-	my ( $suffix, $inc_suffix ) = $self->_path_normalise(@args);
+	my ( $self, @args ) = @_;
 	my @out;
 	for my $path ( $self->inc ) {
 		if ( ref $path ) {
-			my $result = $self->_ref_expand( $path, $inc_suffix );
+			my $result = $self->_ref_expand( $path, @args );
 			if ( $result->[0] ) {
 				shift @{$result};
 				push @out, $result;
 			}
 			next;
 		}
-		my $fullpath = File::Spec->catdir( $path, $suffix );
+		my $fullpath = __path($path)->child(@args);
 		if ( -e $fullpath and -d $fullpath ) {
 			push @out, $fullpath;
 		}
