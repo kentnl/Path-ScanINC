@@ -1,5 +1,7 @@
 Release history for Path-ScanINC
 
+0.012 2013-11-20T12:27:38Z
+
 0.011 2013-11-20T12:27:09Z
  [00 Bugfix]
  - Attempt to solve Win32 quirk by using more Path::Tiny

@@ -2,14 +2,79 @@ use strict;
 use warnings;
 
 package Path::ScanINC;
-BEGIN {
-  $Path::ScanINC::AUTHORITY = 'cpan:KENTNL';
-}
-{
-  $Path::ScanINC::VERSION = '0.011';
-}
-
+$Path::ScanINC::VERSION = '0.012';
 # ABSTRACT: Emulate Perls internal handling of @INC.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # Sub Lazy-Aliases
@@ -28,6 +93,21 @@ sub __path  { require Path::Tiny; goto \&Path::Tiny::path; }
 ## no critic (RequireArgUnpacking)
 sub __croakf { require Carp; @_ = ( sprintf $_[0], splice @_, 1 ); goto \&Carp::croak; }
 ## use critic
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -65,12 +145,44 @@ sub _fix_inc {
 }
 
 
+
+
+
+
+
+
+
 sub BUILD {
 	my ( $self, $args ) = @_;
 	$self->_fix_immutable;
 	$self->_fix_inc;
     return;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 sub inc {
@@ -128,6 +240,59 @@ sub _ref_expand {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 sub first_file {
 	my ( $self, @args ) = @_;
 
@@ -147,6 +312,38 @@ sub first_file {
 	}
 	return;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 sub all_files {
@@ -171,6 +368,11 @@ sub all_files {
 }
 
 
+
+
+
+
+
 sub first_dir {
 	my ( $self, @args ) = @_;
 
@@ -190,6 +392,11 @@ sub first_dir {
 	}
 	return;
 }
+
+
+
+
+
 
 
 sub all_dirs {
@@ -226,7 +433,7 @@ Path::ScanINC - Emulate Perls internal handling of @INC.
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -435,7 +642,7 @@ Kent Fredric <kentnl@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Kent Fredric <kentnl@cpan.org>.
+This software is copyright (c) 2014 by Kent Fredric <kentnl@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
