@@ -1,9 +1,13 @@
+use 5.008;    # utf8
 use strict;
 use warnings;
+use utf8;
 
 package Path::ScanINC;
 $Path::ScanINC::VERSION = '0.012';
 # ABSTRACT: Emulate Perls internal handling of @INC.
+
+our $AUTHORITY = 'cpan:KENTNL'; # AUTHORITY
 
 
 
