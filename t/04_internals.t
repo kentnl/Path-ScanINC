@@ -11,63 +11,63 @@ use winfail;
 use_ok('Path::ScanINC');
 
 subtest __try => sub {
-	will_win 'exceptions not fatal to caller';
-	t { Path::ScanINC::__try( sub { die 'not a problem' } ) };
+  will_win 'exceptions not fatal to caller';
+  t { Path::ScanINC::__try( sub { die 'not a problem' } ) };
 };
 
 subtest __catch => sub {
-	will_win 'exceptions not fatal to caller';
+  will_win 'exceptions not fatal to caller';
 
-	my $caught;
+  my $caught;
 
-	t { Path::ScanINC::__try( sub { die 'not a problem' }, Path::ScanINC::__catch( sub { $caught = $_ } ) ) };
+  t { Path::ScanINC::__try( sub { die 'not a problem' }, Path::ScanINC::__catch( sub { $caught = $_ } ) ) };
 
-	like( $caught, qr/^\Qnot a problem\E/, 'Catch still works' );
+  like( $caught, qr/^\Qnot a problem\E/, 'Catch still works' );
 
 };
 
 subtest __blessed => sub {
-	will_win 'blessed loads ok';
+  will_win 'blessed loads ok';
 
-	my $object = bless( {}, 'foo' );
-	my $gotbless;
+  my $object = bless( {}, 'foo' );
+  my $gotbless;
 
-	t { $gotbless = Path::ScanINC::__blessed($object) };
+  t { $gotbless = Path::ScanINC::__blessed($object) };
 
-	is( $gotbless, 'foo', '__blessed resolves ok' );
+  is( $gotbless, 'foo', '__blessed resolves ok' );
 };
 
 subtest __reftype => sub {
-	will_win 'reftype loads ok';
+  will_win 'reftype loads ok';
 
-	my $gotreftype;
+  my $gotreftype;
 
-	t { $gotreftype = Path::ScanINC::__reftype( [] ) };
+  t { $gotreftype = Path::ScanINC::__reftype( [] ) };
 
-	is( $gotreftype, 'ARRAY', '__reftype resolves ok' );
+  is( $gotreftype, 'ARRAY', '__reftype resolves ok' );
 
 };
 
 subtest __pp => sub {
-	will_win 'pp loads ok';
+  will_win 'pp loads ok';
 
-	my $gotdump;
+  my $gotdump;
 
-	t { $gotdump = Path::ScanINC::__pp( [] ) };
+  t { $gotdump = Path::ScanINC::__pp( [] ) };
 
-	is( $gotdump, '[]', '__pp resolves ok' );
+  is( $gotdump, '[]', '__pp resolves ok' );
 };
 
 subtest __croak => sub {
 
-	will_fail 'croak loads ok ';
+  will_fail 'croak loads ok ';
 
-	t { Path::ScanINC::__croak("its ok") };
+  t { Path::ScanINC::__croak("its ok") };
 };
 
 subtest __croakf => sub {
-	will_fail 'basic croakf';
-	t { Path::ScanINC::__croakf('test') };
+  will_fail 'basic croakf';
+  t { Path::ScanINC::__croakf('test') };
 };
 
 done_testing;

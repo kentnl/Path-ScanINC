@@ -112,36 +112,36 @@ sub __croakf { require Carp; @_ = ( sprintf $_[0], splice @_, 1 ); goto \&Carp::
 
 
 sub _bad_param {
-	my ( $obj, $name, $expected, $got ) = @_;
-	my $format =
-		qq[Initialization parameter '%s' to \$object->new( ) ( %s->new() ) expects %s.\n] . qq[\tYou gave \$object->new( %s => %s )];
-	return __croakf( $format, $name, __blessed($obj), $expected, $name, __pp($got) );
+  my ( $obj, $name, $expected, $got ) = @_;
+  my $format =
+    qq[Initialization parameter '%s' to \$object->new( ) ( %s->new() ) expects %s.\n] . qq[\tYou gave \$object->new( %s => %s )];
+  return __croakf( $format, $name, __blessed($obj), $expected, $name, __pp($got) );
 }
 
 sub _fix_immutable {
-	my ($self) = @_;
-	if ( exists $self->{immutable} ) {
-		return $self->_bad_param( 'immutable', 'undef/a true value', $self->{immutable} ) if ref $self->{immutable};
-		$self->{immutable} = !!( $self->{immutable} );
-	}
-	return;
+  my ($self) = @_;
+  if ( exists $self->{immutable} ) {
+    return $self->_bad_param( 'immutable', 'undef/a true value', $self->{immutable} ) if ref $self->{immutable};
+    $self->{immutable} = !!( $self->{immutable} );
+  }
+  return;
 }
 
 sub _fix_inc {
-	my ($self) = @_;
-	if ( exists $self->{inc} ) {
-		return $self->_bad_param( 'inc', 'an array-reference', $self->{inc} )
-			if not __try { my $i = $self->{inc}->[0]; 1 } __catch { undef };
-	}
-	if ( $self->immutable ) {
-		if ( exists $self->{inc} ) {
-			$self->{inc} = [ @{ $self->{inc} } ];
-		}
-		else {
-			$self->{inc} = [@INC];
-		}
-	}
-	return;
+  my ($self) = @_;
+  if ( exists $self->{inc} ) {
+    return $self->_bad_param( 'inc', 'an array-reference', $self->{inc} )
+      if not __try { my $i = $self->{inc}->[0]; 1 } __catch { undef };
+  }
+  if ( $self->immutable ) {
+    if ( exists $self->{inc} ) {
+      $self->{inc} = [ @{ $self->{inc} } ];
+    }
+    else {
+      $self->{inc} = [@INC];
+    }
+  }
+  return;
 }
 
 
@@ -153,10 +153,10 @@ sub _fix_inc {
 
 
 sub BUILD {
-	my ( $self, $args ) = @_;
-	$self->_fix_immutable;
-	$self->_fix_inc;
-    return;
+  my ( $self, $args ) = @_;
+  $self->_fix_immutable;
+  $self->_fix_inc;
+  return;
 }
 
 
@@ -186,14 +186,14 @@ sub BUILD {
 
 
 sub inc {
-	my ( $obj, @args ) = @_;
-	return @INC if ( not exists $obj->{inc} );
-	return @{ $obj->{inc} };
+  my ( $obj, @args ) = @_;
+  return @INC if ( not exists $obj->{inc} );
+  return @{ $obj->{inc} };
 }
 
 sub _pm_inc_path {
-	my ( $self, @path_parts ) = @_;
-	return join q[/], @path_parts;
+  my ( $self, @path_parts ) = @_;
+  return join q[/], @path_parts;
 }
 
 # This method deals with the fact there are refs in @INC, and they have special magic behaviour.
@@ -208,35 +208,35 @@ sub _pm_inc_path {
 #
 
 sub _ref_expand {
-	my ( $self, $ref, @query ) = @_;
+  my ( $self, $ref, @query ) = @_;
 
-	# See perldoc perlfunc / require
-	if ( __blessed($ref) ) {
-		my (@result) = $ref->INC( $self->_pm_inc_path(@query) );
-		if ( not @result ) {
-			return [ undef, ];
-		}
-		return [ 1, @result ];
-	}
-	if ( __reftype($ref) eq 'CODE' ) {
-		my (@result) = $ref->( $ref, $self->_pm_inc_path(@query) );
-		if ( not @result ) {
-			return [ undef, ];
-		}
-		return [ 1, @result ];
-	}
-	if ( __reftype($ref) eq 'ARRAY' ) {
-		my $code = $ref->[0];
-		my (@result) = $code->( $ref, $self->_pm_inc_path(@query) );
-		if ( not @result ) {
-			return [ undef, ];
-		}
-		return [ 1, @result ];
-	}
-	## no critic (RequireInterpolationOfMetachars)
+  # See perldoc perlfunc / require
+  if ( __blessed($ref) ) {
+    my (@result) = $ref->INC( $self->_pm_inc_path(@query) );
+    if ( not @result ) {
+      return [ undef, ];
+    }
+    return [ 1, @result ];
+  }
+  if ( __reftype($ref) eq 'CODE' ) {
+    my (@result) = $ref->( $ref, $self->_pm_inc_path(@query) );
+    if ( not @result ) {
+      return [ undef, ];
+    }
+    return [ 1, @result ];
+  }
+  if ( __reftype($ref) eq 'ARRAY' ) {
+    my $code = $ref->[0];
+    my (@result) = $code->( $ref, $self->_pm_inc_path(@query) );
+    if ( not @result ) {
+      return [ undef, ];
+    }
+    return [ 1, @result ];
+  }
+  ## no critic (RequireInterpolationOfMetachars)
 
-	__croakf( 'Unknown type of ref in @INC not supported: %s', __reftype($ref) );
-	return [ undef, ];
+  __croakf( 'Unknown type of ref in @INC not supported: %s', __reftype($ref) );
+  return [ undef, ];
 }
 
 
@@ -294,23 +294,23 @@ sub _ref_expand {
 
 
 sub first_file {
-	my ( $self, @args ) = @_;
+  my ( $self, @args ) = @_;
 
-	for my $path ( $self->inc ) {
-		if ( ref $path ) {
-			my $result = $self->_ref_expand( $path, @args );
-			if ( $result->[0] ) {
-				shift @{$result};
-				return $result;
-			}
-			next;
-		}
-		my $fullpath = __path($path)->child(@args);
-		if ( -e $fullpath and -f $fullpath ) {
-			return $fullpath;
-		}
-	}
-	return;
+  for my $path ( $self->inc ) {
+    if ( ref $path ) {
+      my $result = $self->_ref_expand( $path, @args );
+      if ( $result->[0] ) {
+        shift @{$result};
+        return $result;
+      }
+      next;
+    }
+    my $fullpath = __path($path)->child(@args);
+    if ( -e $fullpath and -f $fullpath ) {
+      return $fullpath;
+    }
+  }
+  return;
 }
 
 
@@ -347,24 +347,24 @@ sub first_file {
 
 
 sub all_files {
-	my ( $self, @args ) = @_;
+  my ( $self, @args ) = @_;
 
-	my @out;
-	for my $path ( $self->inc ) {
-		if ( ref $path ) {
-			my $result = $self->_ref_expand( $path, @args );
-			if ( $result->[0] ) {
-				shift @{$result};
-				push @out, $result;
-			}
-			next;
-		}
-		my $fullpath = __path($path)->child(@args);
-		if ( -e $fullpath and -f $fullpath ) {
-			push @out, $fullpath;
-		}
-	}
-	return @out;
+  my @out;
+  for my $path ( $self->inc ) {
+    if ( ref $path ) {
+      my $result = $self->_ref_expand( $path, @args );
+      if ( $result->[0] ) {
+        shift @{$result};
+        push @out, $result;
+      }
+      next;
+    }
+    my $fullpath = __path($path)->child(@args);
+    if ( -e $fullpath and -f $fullpath ) {
+      push @out, $fullpath;
+    }
+  }
+  return @out;
 }
 
 
@@ -374,23 +374,23 @@ sub all_files {
 
 
 sub first_dir {
-	my ( $self, @args ) = @_;
+  my ( $self, @args ) = @_;
 
-	for my $path ( $self->inc ) {
-		if ( ref $path ) {
-			my $result = $self->_ref_expand( $path, @args );
-			if ( $result->[0] ) {
-				shift @{$result};
-				return $result;
-			}
-			next;
-		}
-		my $fullpath = __path($path)->child(@args);
-		if ( -e $fullpath and -d $fullpath ) {
-			return $fullpath;
-		}
-	}
-	return;
+  for my $path ( $self->inc ) {
+    if ( ref $path ) {
+      my $result = $self->_ref_expand( $path, @args );
+      if ( $result->[0] ) {
+        shift @{$result};
+        return $result;
+      }
+      next;
+    }
+    my $fullpath = __path($path)->child(@args);
+    if ( -e $fullpath and -d $fullpath ) {
+      return $fullpath;
+    }
+  }
+  return;
 }
 
 
@@ -400,23 +400,23 @@ sub first_dir {
 
 
 sub all_dirs {
-	my ( $self, @args ) = @_;
-	my @out;
-	for my $path ( $self->inc ) {
-		if ( ref $path ) {
-			my $result = $self->_ref_expand( $path, @args );
-			if ( $result->[0] ) {
-				shift @{$result};
-				push @out, $result;
-			}
-			next;
-		}
-		my $fullpath = __path($path)->child(@args);
-		if ( -e $fullpath and -d $fullpath ) {
-			push @out, $fullpath;
-		}
-	}
-	return @out;
+  my ( $self, @args ) = @_;
+  my @out;
+  for my $path ( $self->inc ) {
+    if ( ref $path ) {
+      my $result = $self->_ref_expand( $path, @args );
+      if ( $result->[0] ) {
+        shift @{$result};
+        push @out, $result;
+      }
+      next;
+    }
+    my $fullpath = __path($path)->child(@args);
+    if ( -e $fullpath and -d $fullpath ) {
+      push @out, $fullpath;
+    }
+  }
+  return @out;
 }
 
 1;
