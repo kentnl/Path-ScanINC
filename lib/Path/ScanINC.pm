@@ -5,6 +5,8 @@ package Path::ScanINC;
 
 # ABSTRACT: Emulate Perls internal handling of @INC.
 
+# AUTHORITY
+
 =head1 SYNOPSIS
 
 The Aim of this module is to fully implement everything Perl does with C<@INC>, to be feature compatible with it, including
