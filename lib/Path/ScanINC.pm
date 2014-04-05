@@ -306,7 +306,7 @@ sub first_file {
       next;
     }
     my $fullpath = path($path)->child(@args);
-    if ( -e $fullpath and -f $fullpath ) {
+    if ( -e $fullpath and not -d $fullpath ) {
       return $fullpath;
     }
   }
@@ -360,7 +360,7 @@ sub all_files {
       next;
     }
     my $fullpath = path($path)->child(@args);
-    if ( -e $fullpath and -f $fullpath ) {
+    if ( -e $fullpath and not -d $fullpath ) {
       push @out, $fullpath;
     }
   }
