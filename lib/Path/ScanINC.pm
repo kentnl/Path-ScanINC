@@ -89,6 +89,7 @@ use Scalar::Util qw( blessed reftype );
 use Carp qw( croak );
 use Path::Tiny qw( path );
 
+## no critic (Bangs::ProhibitDebuggingModules)
 sub __pp { require Data::Dump; goto \&Data::Dump::pp; }
 ## no critic (RequireArgUnpacking)
 sub __croakf { require Carp; @_ = ( sprintf $_[0], splice @_, 1 ); goto \&Carp::croak; }
@@ -112,10 +113,10 @@ sub __croakf { require Carp; @_ = ( sprintf $_[0], splice @_, 1 ); goto \&Carp::
 
 
 sub _bad_param {
-  my ( $obj, $name, $expected, $got ) = @_;
+  my ( $self, $name, $expected, $got ) = @_;
   my $format =
     qq[Initialization parameter '%s' to \$object->new( ) ( %s->new() ) expects %s.\n] . qq[\tYou gave \$object->new( %s => %s )];
-  return __croakf( $format, $name, blessed($obj), $expected, $name, __pp($got) );
+  return __croakf( $format, $name, blessed($self), $expected, $name, __pp($got) );
 }
 
 sub _fix_immutable {
@@ -131,7 +132,7 @@ sub _fix_inc {
   my ($self) = @_;
   if ( exists $self->{inc} ) {
     return $self->_bad_param( 'inc', 'an array-reference', $self->{inc} )
-      if not try { my $i = $self->{inc}->[0]; 1 } catch { undef };
+      if not try { $self->{inc}->[0]; 1 } catch { undef };
   }
   if ( $self->immutable ) {
     if ( exists $self->{inc} ) {
@@ -153,7 +154,7 @@ sub _fix_inc {
 
 
 sub BUILD {
-  my ( $self, $args ) = @_;
+  my ( $self, ) = @_;
   $self->_fix_immutable;
   $self->_fix_inc;
   return;
@@ -186,13 +187,13 @@ sub BUILD {
 
 
 sub inc {
-  my ( $obj, @args ) = @_;
-  return @INC if ( not exists $obj->{inc} );
-  return @{ $obj->{inc} };
+  my ( $self, @args ) = @_;
+  return @INC if ( not exists $self->{inc} );
+  return @{ $self->{inc} };
 }
 
 sub _pm_inc_path {
-  my ( $self, @path_parts ) = @_;
+  my ( undef, @path_parts ) = @_;
   return join q[/], @path_parts;
 }
 
@@ -218,14 +219,14 @@ sub _ref_expand {
     }
     return [ 1, @result ];
   }
-  if ( reftype($ref) eq 'CODE' ) {
+  if ( 'CODE' eq reftype($ref) ) {
     my (@result) = $ref->( $ref, $self->_pm_inc_path(@query) );
     if ( not @result ) {
       return [ undef, ];
     }
     return [ 1, @result ];
   }
-  if ( reftype($ref) eq 'ARRAY' ) {
+  if ( 'ARRAY' eq reftype($ref)) {
     my $code = $ref->[0];
     my (@result) = $code->( $ref, $self->_pm_inc_path(@query) );
     if ( not @result ) {
