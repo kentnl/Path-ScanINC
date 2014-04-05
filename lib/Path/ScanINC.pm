@@ -187,7 +187,7 @@ sub BUILD {
 
 
 sub inc {
-  my ( $self, @args ) = @_;
+  my ( $self, ) = @_;
   return @INC if ( not exists $self->{inc} );
   return @{ $self->{inc} };
 }
@@ -226,7 +226,7 @@ sub _ref_expand {
     }
     return [ 1, @result ];
   }
-  if ( 'ARRAY' eq reftype($ref)) {
+  if ( 'ARRAY' eq reftype($ref) ) {
     my $code = $ref->[0];
     my (@result) = $code->( $ref, $self->_pm_inc_path(@query) );
     if ( not @result ) {
