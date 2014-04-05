@@ -89,6 +89,7 @@ use Scalar::Util qw( blessed reftype );
 use Carp qw( croak );
 use Path::Tiny qw( path );
 
+## no critic (Bangs::ProhibitDebuggingModules)
 sub __pp { require Data::Dump; goto \&Data::Dump::pp; }
 ## no critic (RequireArgUnpacking)
 sub __croakf { require Carp; @_ = ( sprintf $_[0], splice @_, 1 ); goto \&Carp::croak; }
