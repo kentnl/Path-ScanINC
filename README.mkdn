@@ -9,7 +9,7 @@ version 0.012
 # SYNOPSIS
 
 The Aim of this module is to fully implement everything Perl does with `@INC`, to be feature compatible with it, including
-the behaviour with regard to `sub refs` in `@INC`.
+the behavior with regard to `sub refs` in `@INC`.
 
         use Path::ScanINC;
 
@@ -131,7 +131,7 @@ of strings, not slash-separated strings.
         $inc->first_file('MooseX' , 'Declare.pm')  # Good
         $inc->first_file('MooseX/Declare.pm')      # Bad.
 
-This is for several reasons, all of which can be summarised as "Windows".
+This is for several reasons, all of which can be summarized as "Windows".
 
 - `%INC` keys all use Unix notation.
 - `@INC` callbacks expect Unix notation.

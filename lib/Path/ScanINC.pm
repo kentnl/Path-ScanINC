@@ -12,7 +12,7 @@ package Path::ScanINC;
 =head1 SYNOPSIS
 
 The Aim of this module is to fully implement everything Perl does with C<@INC>, to be feature compatible with it, including
-the behaviour with regard to C<sub refs> in C<@INC>.
+the behavior with regard to C<sub refs> in C<@INC>.
 
 
 	use Path::ScanINC;
@@ -261,7 +261,7 @@ of strings, not slash-separated strings.
 	$inc->first_file('MooseX' , 'Declare.pm')  # Good
 	$inc->first_file('MooseX/Declare.pm')      # Bad.
 
-This is for several reasons, all of which can be summarised as "Windows".
+This is for several reasons, all of which can be summarized as "Windows".
 
 =over 4
 
