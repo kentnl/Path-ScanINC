@@ -132,7 +132,7 @@ sub _fix_inc {
   my ($self) = @_;
   if ( exists $self->{inc} ) {
     return $self->_bad_param( 'inc', 'an array-reference', $self->{inc} )
-      if not try { $self->{inc}->[0]; 1 } catch { undef };
+      if not try { scalar $self->{inc}->[0]; 1 } catch { undef };
   }
   if ( $self->immutable ) {
     if ( exists $self->{inc} ) {
@@ -307,7 +307,7 @@ sub first_file {
       next;
     }
     my $fullpath = path($path)->child(@args);
-    if ( -e $fullpath and -f $fullpath ) {
+    if ( -e $fullpath and not -d $fullpath ) {
       return $fullpath;
     }
   }
@@ -361,7 +361,7 @@ sub all_files {
       next;
     }
     my $fullpath = path($path)->child(@args);
-    if ( -e $fullpath and -f $fullpath ) {
+    if ( -e $fullpath and not -d $fullpath ) {
       push @out, $fullpath;
     }
   }
