@@ -10,6 +10,8 @@ use winfail;
 
 use_ok('Path::ScanINC');
 
+=begin comment
+
 subtest __try => sub {
   will_win 'exceptions not fatal to caller';
   t { Path::ScanINC::__try( sub { die 'not a problem' } ) };
@@ -48,6 +50,10 @@ subtest __reftype => sub {
 
 };
 
+=end comment
+
+=cut
+
 subtest __pp => sub {
   will_win 'pp loads ok';
 
@@ -58,12 +64,18 @@ subtest __pp => sub {
   is( $gotdump, '[]', '__pp resolves ok' );
 };
 
+=begin comment
+
 subtest __croak => sub {
 
   will_fail 'croak loads ok ';
 
   t { Path::ScanINC::__croak("its ok") };
 };
+
+=end comment
+
+=cut
 
 subtest __croakf => sub {
   will_fail 'basic croakf';

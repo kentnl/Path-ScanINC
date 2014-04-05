@@ -84,16 +84,12 @@ For more details, see L<< C<perldoc perlfunc> or C<perldoc -f require> |perlfunc
 # Sub Lazy-Aliases
 use subs 'inc';
 use Class::Tiny qw(inc immutable);
+use Try::Tiny qw( try catch );
+use Scalar::Util qw( blessed reftype );
+use Carp qw( croak );
+use Path::Tiny qw( path );
 
-## no critic (ProhibitSubroutinePrototypes)
-sub __try(&;@)   { require Try::Tiny;    goto \&Try::Tiny::try; }
-sub __catch(&;@) { require Try::Tiny;    goto \&Try::Tiny::catch; }
-sub __blessed($) { require Scalar::Util; goto \&Scalar::Util::blessed; }
-sub __reftype($) { require Scalar::Util; goto \&Scalar::Util::reftype; }
-## use critic
-sub __pp    { require Data::Dump; goto \&Data::Dump::pp; }
-sub __croak { require Carp;       goto \&Carp::croak; }
-sub __path  { require Path::Tiny; goto \&Path::Tiny::path; }
+sub __pp { require Data::Dump; goto \&Data::Dump::pp; }
 ## no critic (RequireArgUnpacking)
 sub __croakf { require Carp; @_ = ( sprintf $_[0], splice @_, 1 ); goto \&Carp::croak; }
 ## use critic
@@ -119,7 +115,7 @@ sub _bad_param {
   my ( $obj, $name, $expected, $got ) = @_;
   my $format =
     qq[Initialization parameter '%s' to \$object->new( ) ( %s->new() ) expects %s.\n] . qq[\tYou gave \$object->new( %s => %s )];
-  return __croakf( $format, $name, __blessed($obj), $expected, $name, __pp($got) );
+  return __croakf( $format, $name, blessed($obj), $expected, $name, __pp($got) );
 }
 
 sub _fix_immutable {
@@ -135,7 +131,7 @@ sub _fix_inc {
   my ($self) = @_;
   if ( exists $self->{inc} ) {
     return $self->_bad_param( 'inc', 'an array-reference', $self->{inc} )
-      if not __try { my $i = $self->{inc}->[0]; 1 } __catch { undef };
+      if not try { my $i = $self->{inc}->[0]; 1 } catch { undef };
   }
   if ( $self->immutable ) {
     if ( exists $self->{inc} ) {
@@ -215,21 +211,21 @@ sub _ref_expand {
   my ( $self, $ref, @query ) = @_;
 
   # See perldoc perlfunc / require
-  if ( __blessed($ref) ) {
+  if ( blessed($ref) ) {
     my (@result) = $ref->INC( $self->_pm_inc_path(@query) );
     if ( not @result ) {
       return [ undef, ];
     }
     return [ 1, @result ];
   }
-  if ( __reftype($ref) eq 'CODE' ) {
+  if ( reftype($ref) eq 'CODE' ) {
     my (@result) = $ref->( $ref, $self->_pm_inc_path(@query) );
     if ( not @result ) {
       return [ undef, ];
     }
     return [ 1, @result ];
   }
-  if ( __reftype($ref) eq 'ARRAY' ) {
+  if ( reftype($ref) eq 'ARRAY' ) {
     my $code = $ref->[0];
     my (@result) = $code->( $ref, $self->_pm_inc_path(@query) );
     if ( not @result ) {
@@ -239,7 +235,7 @@ sub _ref_expand {
   }
   ## no critic (RequireInterpolationOfMetachars)
 
-  __croakf( 'Unknown type of ref in @INC not supported: %s', __reftype($ref) );
+  __croakf( 'Unknown type of ref in @INC not supported: %s', reftype($ref) );
   return [ undef, ];
 }
 
@@ -309,7 +305,7 @@ sub first_file {
       }
       next;
     }
-    my $fullpath = __path($path)->child(@args);
+    my $fullpath = path($path)->child(@args);
     if ( -e $fullpath and -f $fullpath ) {
       return $fullpath;
     }
@@ -363,7 +359,7 @@ sub all_files {
       }
       next;
     }
-    my $fullpath = __path($path)->child(@args);
+    my $fullpath = path($path)->child(@args);
     if ( -e $fullpath and -f $fullpath ) {
       push @out, $fullpath;
     }
@@ -389,7 +385,7 @@ sub first_dir {
       }
       next;
     }
-    my $fullpath = __path($path)->child(@args);
+    my $fullpath = path($path)->child(@args);
     if ( -e $fullpath and -d $fullpath ) {
       return $fullpath;
     }
@@ -415,7 +411,7 @@ sub all_dirs {
       }
       next;
     }
-    my $fullpath = __path($path)->child(@args);
+    my $fullpath = path($path)->child(@args);
     if ( -e $fullpath and -d $fullpath ) {
       push @out, $fullpath;
     }
