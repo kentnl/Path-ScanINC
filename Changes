@@ -1,6 +1,6 @@
 Release history for Path-ScanINC
 
-0.020 2014-04-17T11:00:56Z
+0.020 2014-04-17T11:11:41Z
  [00 Minor]
  - Downstream may want to pay attention for this release, but nobody else
    should care
@@ -8,6 +8,11 @@ Release history for Path-ScanINC
  - Installtime deps softend my migrating "current" deps to recommendations
  - Most Silly lazy proxy methods removed in favour of imports
  - Misc other critic cleanups and tidyups
+
+ [Dependencies::Aggregate]
+ - 5.008: 38 → 27
+ - 5.010: 21 → 12
+ - 5.019: 7  → 5
 
  [Dependencies::Stats]
  - Dependencies changed since 0.011, see Changes.deps{,.all,.dev} for
