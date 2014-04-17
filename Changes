@@ -1,6 +1,14 @@
 Release history for Path-ScanINC
 
-0.020 2014-04-05T16:07:05Z
+0.020 2014-04-17T11:00:56Z
+ [00 Minor]
+ - Downstream may want to pay attention for this release, but nobody else
+   should care
+ - Installing tools switched to ExtUtils::MakeMaker
+ - Installtime deps softend my migrating "current" deps to recommendations
+ - Most Silly lazy proxy methods removed in favour of imports
+ - Misc other critic cleanups and tidyups
+
  [Dependencies::Stats]
  - Dependencies changed since 0.011, see Changes.deps{,.all,.dev} for
    details
