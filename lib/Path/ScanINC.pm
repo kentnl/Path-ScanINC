@@ -4,7 +4,7 @@ use warnings;
 use utf8;
 
 package Path::ScanINC;
-$Path::ScanINC::VERSION = '0.012';
+$Path::ScanINC::VERSION = '0.020';
 # ABSTRACT: Emulate Perls internal handling of @INC.
 
 our $AUTHORITY = 'cpan:KENTNL'; # AUTHORITY
@@ -434,7 +434,7 @@ Path::ScanINC - Emulate Perls internal handling of @INC.
 
 =head1 VERSION
 
-version 0.012
+version 0.020
 
 =head1 SYNOPSIS
 

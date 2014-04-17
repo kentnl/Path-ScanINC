@@ -114,7 +114,7 @@
    "provides" : {
       "Path::ScanINC" : {
          "file" : "lib/Path/ScanINC.pm",
-         "version" : "0.012"
+         "version" : "0.020"
       }
    },
    "release_status" : "stable",
@@ -129,7 +129,7 @@
          "web" : "https://github.com/kentfredric/Path-ScanINC"
       }
    },
-   "version" : "0.012",
+   "version" : "0.020",
    "x_BuiltWith" : {
       "modules" : {
          "CPAN::Meta" : "2.140640",
@@ -620,7 +620,7 @@
                "Dist::Zilla::Plugin::Git::Tag" : {
                   "branch" : null,
                   "signed" : 0,
-                  "tag" : "0.012-source",
+                  "tag" : "0.020-source",
                   "tag_format" : "%v-source",
                   "tag_message" : "v%v",
                   "time_zone" : "local"
@@ -679,7 +679,7 @@
                "Dist::Zilla::Plugin::Git::Tag" : {
                   "branch" : "releases",
                   "signed" : 0,
-                  "tag" : "0.012",
+                  "tag" : "0.020",
                   "tag_format" : "%v",
                   "tag_message" : "v%v",
                   "time_zone" : "local"
