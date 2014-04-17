@@ -105,7 +105,7 @@ x_BuiltWith:
     Test::More: '1.001003'
     Test::Pod: '1.48'
     Test::Pod::Coverage: '1.08'
-    Try::Tiny: '0.20'
+    Try::Tiny: '0.21'
     lib: '0.63'
     strict: '1.08'
     subs: '1.02'
