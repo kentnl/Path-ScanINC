@@ -2,11 +2,11 @@ NAME
     Path::ScanINC - Emulate Perls internal handling of @INC.
 
 VERSION
-    version 0.011
+    version 0.020
 
 SYNOPSIS
     The Aim of this module is to fully implement everything Perl does with
-    @INC, to be feature compatible with it, including the behaviour with
+    @INC, to be feature compatible with it, including the behavior with
     regard to "sub refs" in @INC.
 
             use Path::ScanINC;
@@ -134,7 +134,7 @@ METHODS
             $inc->first_file('MooseX' , 'Declare.pm')  # Good
             $inc->first_file('MooseX/Declare.pm')      # Bad.
 
-    This is for several reasons, all of which can be summarised as
+    This is for several reasons, all of which can be summarized as
     "Windows".
 
     *   %INC keys all use Unix notation.
@@ -206,7 +206,7 @@ AUTHOR
     Kent Fredric <kentnl@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2013 by Kent Fredric <kentnl@cpan.org>.
+    This software is copyright (c) 2014 by Kent Fredric <kentnl@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
