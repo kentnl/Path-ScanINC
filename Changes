@@ -9,6 +9,11 @@ Release history for Path-ScanINC
  - Most Silly lazy proxy methods removed in favour of imports
  - Misc other critic cleanups and tidyups
 
+ [Dependencies::Aggregate]
+ - 5.008: 38 → 27
+ - 5.010: 21 → 12
+ - 5.019: 7  → 5
+
  [Dependencies::Stats]
  - Dependencies changed since 0.011, see Changes.deps{,.all,.dev} for
    details
