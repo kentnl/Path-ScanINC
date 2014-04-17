@@ -1,6 +1,6 @@
-0.012
+0.020
  [Added / configure recommends]
- - ExtUtils::MakeMaker 6.90
+ - ExtUtils::MakeMaker 6.96
 
  [Added / configure requires]
  - ExtUtils::MakeMaker 6.30
@@ -14,11 +14,14 @@
  - Dist::Zilla::Plugin::RunExtraTests
  - Dist::Zilla::Plugin::Test::ReportPrereqs
 
+ [Added / runtime requires]
+ - utf8
+
  [Added / test recommends]
  - CPAN::Meta
  - CPAN::Meta::Requirements 2.120900
- - ExtUtils::MakeMaker 6.90
- - Test::More 1.001002
+ - ExtUtils::MakeMaker 6.96
+ - Test::More 1.001003
 
  [Added / test requires]
  - ExtUtils::MakeMaker
@@ -26,7 +29,10 @@
  - version
 
  [Changed / develop requires]
- - Dist::Zilla::PluginBundle::Author::KENTNL 2.002001 → 2.012000
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.002001 → 2.013003
+
+ [Changed / runtime requires]
+ - perl 5.006 → 5.008
 
  [Changed / test requires]
  - Test::More 1.001002 → 0.98

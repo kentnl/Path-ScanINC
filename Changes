@@ -5,9 +5,10 @@ Release history for Path-ScanINC
  - Dependencies changed since 0.011, see Changes.deps{,.all,.dev} for
    details
  - build: -1
- - configure: +2 -1
+ - configure: +1 -1 (recommends: +1)
  - develop: +7 ↑1 -9
- - test: +7 ↓1
+ - runtime: +1 ↑1
+ - test: +3 ↓1 (recommends: +4)
 
 0.011 2013-11-20T12:27:09Z
  [00 Bugfix]
@@ -34,7 +35,7 @@ Release history for Path-ScanINC
    details
  - build: ↑1
  - configure: ↑1
- - develop: +45 -3
+ - develop: +44 -1 (recommends: -1, suggests: +1 -1)
  - runtime: +3 -1
  - test: +2 ↑1 -2
 
@@ -72,7 +73,7 @@ Release history for Path-ScanINC
    details
  - build: ↑1
  - configure: ↑1
- - develop: +6 ↑1
+ - develop: +6 (suggests: ↑1)
  - test: ↑1
 
  [Documentation]

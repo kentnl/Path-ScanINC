@@ -1,4 +1,4 @@
-0.012
+0.020
  [Added / develop requires]
  - Dist::Zilla::Plugin::Git::NextRelease
  - Dist::Zilla::Plugin::Git::NextVersion::Sanitized
@@ -9,7 +9,7 @@
  - Dist::Zilla::Plugin::Test::ReportPrereqs
 
  [Changed / develop requires]
- - Dist::Zilla::PluginBundle::Author::KENTNL 2.002001 → 2.012000
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.002001 → 2.013003
 
  [Removed / develop requires]
  - Dist::Zilla::Plugin::Author::KENTNL::MinimumPerl
