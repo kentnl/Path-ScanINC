@@ -1,6 +1,15 @@
 Release history for Path-ScanINC
 
 {{$NEXT}}
+ [00 Minor]
+ - Misc changes that have a chance of affecting hand-operated downstreams.
+
+ [01 Version Scheme Change]
+ - Migrate from mantissa = 3 ( x.yyy ) to mantissa = 6 ( x.yyyzzz )
+ - https://questhub.io/realm/perl/quest/5388d3a9bbd0be2224000129
+ - This could ordinarily have been done safely by adding a few extra 0's on the release, but bumping the major was
+   simply added precuation.
+
  [Dependencies::Stats]
  - Dependencies changed since 0.020, see misc/*.deps* for details
  - configure: (recommends: ↑1)
