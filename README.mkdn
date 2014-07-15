@@ -4,7 +4,7 @@ Path::ScanINC - Emulate Perls internal handling of @INC.
 
 # VERSION
 
-version 0.020
+version 0.021
 
 # SYNOPSIS
 
@@ -106,7 +106,7 @@ every time the original array reference passed during construction gets updated:
         is( [ $a->inc ]->[0] , 'a' , "non-immutable references keep tracking their original" );
         isnt( [ $b->inc ]->[0] , 'a' , "immutable references are shallow-copied at construction" );
 
-Do note of course that is a __SHALLOW__ copy, so if you have multiple `@INC` copies sharing the same `array`/`bless`
+Do note of course that is a **SHALLOW** copy, so if you have multiple `@INC` copies sharing the same `array`/`bless`
 references, changes to those references will be shared amongst all `@INC`'s .
 
 ## first\_file
@@ -123,7 +123,7 @@ This proves to be a handy little gem that replaces the oft used
 
 And adds the benefit of not needing to actually source the file to see if it exists or not.
 
-#### __IMPORTANT__: PORTABILITIY
+#### **IMPORTANT**: PORTABILITIY
 
 For best system portability, where possible, its suggested you specify paths as arrays
 of strings, not slash-separated strings.
@@ -183,7 +183,7 @@ I might even be tempted to make a sub-module to make one-liners easier like
 
         perl -MPath::ScanINC::All=Scalar/Util.pm
 
-__REMINDER__: If there are `REFS` in `@INC` that match, they'll return `array-ref`'s, not strings.
+**REMINDER**: If there are `REFS` in `@INC` that match, they'll return `array-ref`'s, not strings.
 
 ## first\_dir
 
