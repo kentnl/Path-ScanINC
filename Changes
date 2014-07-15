@@ -1,9 +1,10 @@
 Release history for Path-ScanINC
 
+0.021 2014-07-15T06:12:19Z
+
 0.020 2014-04-17T11:11:41Z
  [00 Minor]
- - Downstream may want to pay attention for this release, but nobody else
-   should care
+ - Downstream may want to pay attention for this release, but nobody else should care
  - Installing tools switched to ExtUtils::MakeMaker
  - Installtime deps softend my migrating "current" deps to recommendations
  - Most Silly lazy proxy methods removed in favour of imports
@@ -15,8 +16,7 @@ Release history for Path-ScanINC
  - 5.019: 7  → 5
 
  [Dependencies::Stats]
- - Dependencies changed since 0.011, see Changes.deps{,.all,.dev} for
-   details
+ - Dependencies changed since 0.011, see misc/*.deps* for details
  - build: -1
  - configure: +1 -1 (recommends: +1)
  - develop: +7 ↑1 -9
@@ -28,24 +28,21 @@ Release history for Path-ScanINC
  - Attempt to solve Win32 quirk by using more Path::Tiny
 
  [Dependencies::Stats]
- - Dependencies changed since 0.010, see Changes.deps{,.all,.dev} for
-   details
+ - Dependencies changed since 0.010, see misc/*.deps* for details
  - test: -1
 
 0.010 2013-11-20T04:28:29Z
  [00 Major Changes]
  - Internals reimplemented in terms of Module::Build and Path::Tiny
  - Interface should however still be mostly the same.
- - Query functions now return Path::Tiny objects, which you can stringify
-   if thats a problem.
+ - Query functions now return Path::Tiny objects, which you can stringify if thats a problem.
 
  [Dependencies::Noteworthy]
  - Add Class::Tiny for runtime
  - Add Path::Tiny  for runtime
 
  [Dependencies::Stats]
- - Dependencies changed since 0.003, see Changes.deps{,.all,.dev} for
-   details
+ - Dependencies changed since 0.003, see misc/*.deps* for details
  - build: ↑1
  - configure: ↑1
  - develop: +44 -1 (recommends: -1, suggests: +1 -1)
@@ -82,8 +79,7 @@ Release history for Path-ScanINC
 
 0.003 2013-04-19T19:58:58Z
  [Dependencies::Stats]
- - Dependencies changed since 0.002, see Changes.deps{,.all,.dev} for
-   details
+ - Dependencies changed since 0.002, see misc/*.deps* for details
  - build: ↑1
  - configure: ↑1
  - develop: +6 (suggests: ↑1)
@@ -97,8 +93,7 @@ Release history for Path-ScanINC
  [Internals]
  - Overhauled some codepaths so error handling logic was unified
  - Carp errors will now acutally give errors, not numbers.
- - Removed some internal checks on invocation style between private
-   methods.
+ - Removed some internal checks on invocation style between private methods.
  - Improved error messages / error message utils.
  - tests slightly refactored and expanded.
 
@@ -113,9 +108,8 @@ Release history for Path-ScanINC
  - Improved documentation on passing paths in a cross-system portable way.
 
  [Internals]
- - Seperate code logic for @INC callback lookup and physical path lookup,
-   as physical path lookup is always system dependent, while @INC callbacks
-   are always Unix style.
+ - Seperate code logic for @INC callback lookup and physical path lookup, as physical path lookup is always system
+   dependent, while @INC callbacks are always Unix style.
 
 0.001 2012-03-23T17:33:09Z
  - First version.
