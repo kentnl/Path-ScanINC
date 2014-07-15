@@ -1,6 +1,6 @@
 Release history for Path-ScanINC
 
-0.021000 2014-07-15T06:15:44Z
+1.000000 2014-07-15T06:17:16Z
  [Dependencies::Stats]
  - Dependencies changed since 0.020, see misc/*.deps* for details
  - configure: (recommends: ↑1)
