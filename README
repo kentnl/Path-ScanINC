@@ -2,7 +2,7 @@ NAME
     Path::ScanINC - Emulate Perls internal handling of @INC.
 
 VERSION
-    version 0.021
+    version 0.021000
 
 SYNOPSIS
     The Aim of this module is to fully implement everything Perl does with

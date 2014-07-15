@@ -23,7 +23,7 @@ name: Path-ScanINC
 provides:
   Path::ScanINC:
     file: lib/Path/ScanINC.pm
-    version: '0.021'
+    version: '0.021000'
 requires:
   Carp: '0'
   Class::Tiny: '0'
@@ -40,7 +40,7 @@ resources:
   bugtracker: https://github.com/kentfredric/Path-ScanINC/issues
   homepage: https://github.com/kentfredric/Path-ScanINC
   repository: https://github.com/kentfredric/Path-ScanINC.git
-version: '0.021'
+version: '0.021000'
 x_BuiltWith:
   modules:
     CPAN::Meta: '2.141520'
@@ -139,7 +139,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::Repo:
           repo_root: .
         Dist::Zilla::Role::Version::Sanitize:
-          mantissa: '3'
+          mantissa: '6'
           normal_form: numify
       name: '@Author::KENTNL/Git::NextVersion::Sanitized'
       version: '0.002000'
@@ -439,7 +439,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Tag:
           branch: ~
           signed: 0
-          tag: 0.021-source
+          tag: 0.021000-source
           tag_format: '%v-source'
           tag_message: v%v
           time_zone: local
@@ -489,7 +489,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Tag:
           branch: releases
           signed: 0
-          tag: '0.021'
+          tag: '0.021000'
           tag_format: '%v'
           tag_message: v%v
           time_zone: local

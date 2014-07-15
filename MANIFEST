@@ -11,6 +11,7 @@ Makefile.PL
 README
 TODO
 dist.ini
+dist.ini.meta
 lib/Path/ScanINC.pm
 maint-travis-ci/.gitrepo
 maint-travis-ci/.perltidyrc
