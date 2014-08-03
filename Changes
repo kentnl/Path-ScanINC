@@ -1,6 +1,9 @@
 Release history for Path-ScanINC
 
 {{$NEXT}}
+ [00 Trivial]
+ - Migrate to kentnl org.
+
  [Dependencies::Stats]
  - Dependencies changed since 1.000000, see misc/*.deps* for details
  - configure: ↓1
