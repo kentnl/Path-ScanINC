@@ -1,6 +1,10 @@
 Release history for Path-ScanINC
 
-1.000001 2014-08-03T12:40:04Z
+1.000001 2014-08-03T12:42:27Z
+ [00 Trivial]
+ - Migrate to kentnl org.
+ - Use a less-likely-to-be-broken version reporting test.
+
  [Dependencies::Stats]
  - Dependencies changed since 1.000000, see misc/*.deps* for details
  - configure: ↓1
