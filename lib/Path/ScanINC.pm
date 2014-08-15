@@ -11,78 +11,6 @@ our $VERSION = '1.000002';
 
 # AUTHORITY
 
-=head1 SYNOPSIS
-
-The Aim of this module is to fully implement everything Perl does with C<@INC>, to be feature compatible with it, including
-the behavior with regard to C<sub refs> in C<@INC>.
-
-
-	use Path::ScanINC;
-
-	# Normal usage.
-	my $inc = Path::ScanINC->new( );
-
-	# In case you need something that isn't @INC
-	# but works like it
-
-	my $inc = Path::ScanINC->new( inc => \@INC );
-
-	# Freeze the value of @INC at the time of object instantiation
-	# with regard to behaviour so later changes to @INC have no effect
-
-	my $inc = Path::ScanINC->new( immutable => 1 );
-
-	# Return the first file in @INC that matches.
-
-	my $file = $inc->first_file('Path', 'ScanINC.pm' );
-
-	# Find all possible versions of modules in @INC
-	my ( @files ) = $inc->all_files('Path', 'ScanINC.pm');
-
-	# Try to discover a File::ShareDir 'module' root.
-	my $dir = $inc->first_dir('auto','share','module');
-
-	# Should return the same as File::ShareDir::module_dir('Path::ScanINC')
-	# ( assuming such a directory existed, which there is presently no plans of )
-	my $dir = $inc->first_dir('auto','share','module','Path-ScanINC');
-
-
-	# Find All File::ShareDir roots in @INC
-	my ( @dirs ) = $inc->all_dirs('auto', 'share');
-
-=head1 REF SUPPORT IN @INC
-
-This module has elemental support for discovery of results in C<@INC> using C<CODE>/C<ARRAY>/C<BLESSED> entries in
-C<@INC>. However, due to a limitation as to how C<perl> itself implements this functionality, the best we can do at present
-is simply return what the above are expected to return. This means if you have any of the above ref-types in C<@INC>,
-and one of those returns C<a true value>, you'll get handed back an C<ARRAY> reference instead of the file you were
-expecting.
-
-Fortunately, C<@INC> barely ever has refs in it. But in the event you I<need> to work with refs in C<@INC> and you
-expect that those refs will return C<true>, you have to pick one of two options, either :
-
-=over 4
-
-=item a. Write your code to work with the C<array-ref> returned by the respective reference on a match
-
-=item b. Use the C<all_> family of methods and try pretending that there are no C<array-refs> in the list it returns.
-
-=back
-
-Its possible in a future release we may have better choices how to handle this situation in future, but don't bet on it.
-
-Given that the API as defined by Perl mandates C<code-ref>'s return lists containing C<file-handles> or iterative
-C<code-ref>'s , not actual files, the best I can foresee at this time we'd be able to do to make life easier for you is
-creating a fake library somewhere in a C<tempdir> and stuffing the result of the C<code-ref>'s into files in that directory
-prior to returning a path to the generated file.
-
-( And it also tells me that they have to be "Real" file handles, not tied or blessed ones, so being able to ask a
-C<filehandle> what file it represents is equally slim.... if that is of course what you require )
-
-For more details, see L<< C<perldoc perlfunc> or C<perldoc -f require> |perlfunc/require >>.
-
-=cut
-
 # Sub Lazy-Aliases
 use subs 'inc';
 use Class::Tiny qw(inc immutable);
@@ -423,3 +351,75 @@ sub all_dirs {
 }
 
 1;
+
+=head1 SYNOPSIS
+
+The Aim of this module is to fully implement everything Perl does with C<@INC>, to be feature compatible with it, including
+the behavior with regard to C<sub refs> in C<@INC>.
+
+
+	use Path::ScanINC;
+
+	# Normal usage.
+	my $inc = Path::ScanINC->new( );
+
+	# In case you need something that isn't @INC
+	# but works like it
+
+	my $inc = Path::ScanINC->new( inc => \@INC );
+
+	# Freeze the value of @INC at the time of object instantiation
+	# with regard to behaviour so later changes to @INC have no effect
+
+	my $inc = Path::ScanINC->new( immutable => 1 );
+
+	# Return the first file in @INC that matches.
+
+	my $file = $inc->first_file('Path', 'ScanINC.pm' );
+
+	# Find all possible versions of modules in @INC
+	my ( @files ) = $inc->all_files('Path', 'ScanINC.pm');
+
+	# Try to discover a File::ShareDir 'module' root.
+	my $dir = $inc->first_dir('auto','share','module');
+
+	# Should return the same as File::ShareDir::module_dir('Path::ScanINC')
+	# ( assuming such a directory existed, which there is presently no plans of )
+	my $dir = $inc->first_dir('auto','share','module','Path-ScanINC');
+
+
+	# Find All File::ShareDir roots in @INC
+	my ( @dirs ) = $inc->all_dirs('auto', 'share');
+
+=head1 REF SUPPORT IN @INC
+
+This module has elemental support for discovery of results in C<@INC> using C<CODE>/C<ARRAY>/C<BLESSED> entries in
+C<@INC>. However, due to a limitation as to how C<perl> itself implements this functionality, the best we can do at present
+is simply return what the above are expected to return. This means if you have any of the above ref-types in C<@INC>,
+and one of those returns C<a true value>, you'll get handed back an C<ARRAY> reference instead of the file you were
+expecting.
+
+Fortunately, C<@INC> barely ever has refs in it. But in the event you I<need> to work with refs in C<@INC> and you
+expect that those refs will return C<true>, you have to pick one of two options, either :
+
+=over 4
+
+=item a. Write your code to work with the C<array-ref> returned by the respective reference on a match
+
+=item b. Use the C<all_> family of methods and try pretending that there are no C<array-refs> in the list it returns.
+
+=back
+
+Its possible in a future release we may have better choices how to handle this situation in future, but don't bet on it.
+
+Given that the API as defined by Perl mandates C<code-ref>'s return lists containing C<file-handles> or iterative
+C<code-ref>'s , not actual files, the best I can foresee at this time we'd be able to do to make life easier for you is
+creating a fake library somewhere in a C<tempdir> and stuffing the result of the C<code-ref>'s into files in that directory
+prior to returning a path to the generated file.
+
+( And it also tells me that they have to be "Real" file handles, not tied or blessed ones, so being able to ask a
+C<filehandle> what file it represents is equally slim.... if that is of course what you require )
+
+For more details, see L<< C<perldoc perlfunc> or C<perldoc -f require> |perlfunc/require >>.
+
+=cut
