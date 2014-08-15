@@ -1,6 +1,9 @@
 Release history for Path-ScanINC
 
 {{$NEXT}}
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000001, see misc/*.deps* for details
+ - develop: +1 (suggests: ↑1)
 
 1.000001 2014-08-03T12:42:27Z
  [00 Trivial]
