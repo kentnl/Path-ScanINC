@@ -5,7 +5,7 @@ use utf8;
 
 package Path::ScanINC;
 
-our $VERSION = '1.000002';
+our $VERSION = '1.000003';
 
 # ABSTRACT: Emulate Perls internal handling of @INC.
 
