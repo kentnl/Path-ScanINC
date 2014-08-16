@@ -5,83 +5,11 @@ use utf8;
 
 package Path::ScanINC;
 
-our $VERSION = '1.000001';
+our $VERSION = '1.000002';
 
 # ABSTRACT: Emulate Perls internal handling of @INC.
 
 our $AUTHORITY = 'cpan:KENTNL'; # AUTHORITY
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # Sub Lazy-Aliases
 use subs 'inc';
@@ -436,7 +364,7 @@ Path::ScanINC - Emulate Perls internal handling of @INC.
 
 =head1 VERSION
 
-version 1.000001
+version 1.000002
 
 =head1 SYNOPSIS
 
