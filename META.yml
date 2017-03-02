@@ -24,7 +24,7 @@ name: Path-ScanINC
 provides:
   Path::ScanINC:
     file: lib/Path/ScanINC.pm
-    version: '1.000003'
+    version: '1.000004'
 recommends:
   Path::Tiny: '0.058'
 requires:
@@ -43,4 +43,4 @@ resources:
   bugtracker: https://github.com/kentnl/Path-ScanINC/issues
   homepage: https://github.com/kentnl/Path-ScanINC
   repository: https://github.com/kentnl/Path-ScanINC.git
-version: '1.000003'
+version: '1.000004'

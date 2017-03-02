@@ -5,7 +5,7 @@ use utf8;
 
 package Path::ScanINC;
 
-our $VERSION = '1.000003';
+our $VERSION = '1.000004';
 
 # ABSTRACT: Emulate Perls internal handling of @INC.
 
@@ -364,7 +364,7 @@ Path::ScanINC - Emulate Perls internal handling of @INC.
 
 =head1 VERSION
 
-version 1.000003
+version 1.000004
 
 =head1 SYNOPSIS
 
