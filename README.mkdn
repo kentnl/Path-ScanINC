@@ -44,6 +44,12 @@ the behavior with regard to `sub refs` in `@INC`.
         # Find All File::ShareDir roots in @INC
         my ( @dirs ) = $inc->all_dirs('auto', 'share');
 
+# DESCRIPTION
+
+`Path::ScanINC` is a basic tool for traversing `@INC` in a `perl`-like manner, stepping over some common
+pitfalls with using it. It also has the property of being able to capture `@INC` states to emulate a portable
+isolated library resolver.
+
 # REF SUPPORT IN @INC
 
 This module has elemental support for discovery of results in `@INC` using `CODE`/`ARRAY`/`BLESSED` entries in

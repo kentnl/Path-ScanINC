@@ -391,6 +391,12 @@ the behavior with regard to C<sub refs> in C<@INC>.
 	# Find All File::ShareDir roots in @INC
 	my ( @dirs ) = $inc->all_dirs('auto', 'share');
 
+=head1 DESCRIPTION
+
+C<Path::ScanINC> is a basic tool for traversing C<@INC> in a C<perl>-like manner, stepping over some common
+pitfalls with using it. It also has the property of being able to capture C<@INC> states to emulate a portable
+isolated library resolver.
+
 =head1 REF SUPPORT IN @INC
 
 This module has elemental support for discovery of results in C<@INC> using C<CODE>/C<ARRAY>/C<BLESSED> entries in
