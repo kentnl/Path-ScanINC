@@ -1,5 +1,17 @@
 Release history for Path-ScanINC
 
+1.000003 2017-03-02T03:48:19Z 208778f
+ [BugFix]
+ - Avoid test failures on 5.26 w/ -Ddefault_inc_excludes_dot
+ - Closes https://github.com/kentnl/Path-ScanINC/issues/1
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000002, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +14 ↑4 -3 (recommends: +1, suggests: ↑2)
+ - runtime: (recommends: +1)
+ - test: +1 (recommends: ↑1 ↓1)
+
 1.000002 2014-08-15T23:24:23Z
  [00 Trivial]
  - CPANDAY!
@@ -151,4 +163,3 @@ Release history for Path-ScanINC
 
 0.001 2012-03-23T17:33:09Z
  - First version.
-
