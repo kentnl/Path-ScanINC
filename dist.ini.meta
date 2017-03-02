@@ -9,7 +9,6 @@ copyright_holder = Kent Fredric <kentnl@cpan.org>
 
 [@Author::KENTNL]
 :version          = 2.016
-git_versions      = 1
 normal_form       = numify
 mantissa          = 6
 toolkit           = eumm
@@ -17,6 +16,8 @@ toolkit_hardness  = soft
 bumpversions      = 1
 copyfiles         = LICENSE
 srcreadme         = mkdn
+Test::Compile::PerFile.:version = 0.003902
+Test::Compile::PerFile.test_template = 02-raw-require.t.tpl
 
 ;version_major     = 0
 ; version_minor     = 1
