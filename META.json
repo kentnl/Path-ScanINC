@@ -452,12 +452,12 @@
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
-                        "name" : "REF SUPPORT IN @INC",
+                        "name" : "DESCRIPTION",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
-                        "name" : "DESCRIPTION",
+                        "name" : "REF SUPPORT IN @INC",
                         "version" : "4.015"
                      },
                      {

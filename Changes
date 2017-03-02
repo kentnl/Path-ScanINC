@@ -1,6 +1,6 @@
 Release history for Path-ScanINC
 
-1.000003 2017-03-02T03:40:32Z 678cf3c
+1.000003 2017-03-02T03:48:19Z 208778f
  [BugFix]
  - Avoid test failures on 5.26 w/ -Ddefault_inc_excludes_dot
  - Closes https://github.com/kentnl/Path-ScanINC/issues/1

@@ -1,6 +1,9 @@
 Path::ScanINC
 
-
+"Path::ScanINC" is a basic tool for traversing @INC in a "perl"-like
+manner, stepping over some common pitfalls with using it. It also has
+the property of being able to capture @INC states to emulate a portable
+isolated library resolver.
 
 INSTALLATION
 
